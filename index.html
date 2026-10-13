@@ -146,6 +146,8 @@
   .panneau-annuler h2 { font: 800 24px/1.2 var(--display); margin: 0 0 10px; }
   .panneau-annuler .r-actions { margin-top: 16px; }
   .note-retrait { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 8px 12px; border-radius: 6px; margin: 10px 0 0; }
+  .crudites-jour { margin: 2px 0 22px; }
+  .crudites-jour legend { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
   .msg-err { display: none; color: var(--error); font-weight: 700; font-size: 15px; margin-top: 6px; }
   .en-erreur .msg-err { display: block; }
   .en-erreur input[type=text], .en-erreur input[type=email], .en-erreur input[type=tel], .en-erreur input[type=date],
@@ -468,14 +470,6 @@
         <span class="msg-err" data-t="e_choix"></span>
       </fieldset>
       <div id="liste-sandwiches"></div>
-      <fieldset data-champ="crudites" id="bloc-crudites">
-        <legend data-t="crudites_q"></legend>
-        <div class="choix">
-          <label class="opt"><input type="radio" name="crudites" value="Avec"><span data-t="avec"></span></label>
-          <label class="opt"><input type="radio" name="crudites" value="Sans"><span data-t="sans"></span></label>
-        </div>
-        <span class="msg-err" data-t="e_choix"></span>
-      </fieldset>
     </section>
 
     <section>
@@ -551,7 +545,7 @@
       eng_jour: '{jour} : de {debut} à {fin}', eng_plus_tard: '{jour} : les heures te seront données plus tard',
       n_engagement: 'Ton engagement', r_engagement: 'Engagement', r_engagement_oui: 'Oui, je serai là aux heures indiquées',
       debout: 'Je ne peux pas rester debout longtemps', charges: 'Je ne peux pas porter de choses lourdes', limit_autre: 'Autre chose à savoir',
-      s_repas: 'Repas', sandwich_q: 'Ton sandwich pour {jour}', crudites_q: 'Avec ou sans crudités ?',
+      s_repas: 'Repas', sandwich_q: 'Ton sandwich pour {jour}', crudites_q: 'Avec ou sans crudités ?', crudites_jour: 'Avec ou sans crudités, pour {jour} ?',
       avec: 'Avec crudités', sans: 'Sans crudités',
       s_fin: 'Pour terminer', majeur: 'J’aurai au moins 18 ans le {date}.', majeur_simple: 'J’ai au moins 18 ans.',
       consent: 'J’accepte que l’équipe utilise mes données pour organiser les bénévoles de la convention.',
@@ -644,7 +638,7 @@
       eng_jour: '{jour}: van {debut} tot {fin}', eng_plus_tard: '{jour}: de uren volgen later',
       n_engagement: 'Jouw engagement', r_engagement: 'Engagement', r_engagement_oui: 'Ja, ik ben er op de aangegeven uren',
       debout: 'Ik kan niet lang blijven staan', charges: 'Ik kan geen zware dingen dragen', limit_autre: 'Iets anders om te weten',
-      s_repas: 'Maaltijden', sandwich_q: 'Je broodje voor {jour}', crudites_q: 'Met of zonder groenten?',
+      s_repas: 'Maaltijden', sandwich_q: 'Je broodje voor {jour}', crudites_q: 'Met of zonder groenten?', crudites_jour: 'Met of zonder groenten, voor {jour}?',
       avec: 'Met groenten', sans: 'Zonder groenten',
       s_fin: 'Tot slot', majeur: 'Ik ben minstens 18 jaar op {date}.', majeur_simple: 'Ik ben minstens 18 jaar.',
       consent: 'Ik ga ermee akkoord dat het team mijn gegevens gebruikt om de vrijwilligers van de conventie te organiseren.',
@@ -881,7 +875,6 @@
     const aRepas = !!lib(cfg.repas);
     $('#bloc-repas').hidden = !aRepas;
     $('#repas-q').textContent = lib(cfg.repas);
-    $('#bloc-crudites').hidden = !cfg.crudites;
     majSandwiches();
 
     // Âge
@@ -894,10 +887,13 @@
     }
   }
 
+  const sansSandwich = nom => !nom || /^(rien|niets|aucun|pas de sandwich)/i.test(String(nom).trim());
+
   function majSandwiches() {
     const zone = $('#liste-sandwiches');
-    const avant = {};
+    const avant = {}, avantC = {};
     $$('select[data-sandwich]', zone).forEach(s => { avant[s.dataset.sandwich] = s.value; });
+    $$('input[data-crudites]:checked', zone).forEach(i => { avantC[i.dataset.crudites] = i.value; });
     const jours = new Set($$('input[name=jours]:checked').map(i => i.value));
     const concernés = cfg.jours.filter(j => j.sandwich && jours.has(j.code));
     zone.replaceChildren(...concernés.map(j => {
@@ -909,9 +905,26 @@
       const v = avant[j.code] || (form._sandwichesInitiaux || {})[j.code] || '';
       s.append(option('', t('choisir')), ...permis.map(x => option(x.fr, lib(x), x.fr === v)));
       const e = document.createElement('span'); e.className = 'msg-err'; e.textContent = t('e_choix');
-      d.append(l, s, e); return d;
+      d.append(l, s, e);
+      if (!cfg.crudites) return d;
+      // Avec ou sans crudités, pour ce sandwich-là (pas de question pour « Rien »)
+      const c = document.createElement('fieldset'); c.className = 'crudites-jour'; c.dataset.champ = 'crudites_' + j.code;
+      const lg = document.createElement('legend'); lg.textContent = t('crudites_jour', { jour: lib(j) });
+      const ch = document.createElement('div'); ch.className = 'choix';
+      const vc = avantC[j.code] || (form._cruditesInitiaux || {})[j.code] || '';
+      ['Avec', 'Sans'].forEach(x => {
+        const lab = document.createElement('label'); lab.className = 'opt';
+        const i = document.createElement('input'); i.type = 'radio'; i.name = 'crudites_' + j.code; i.value = x; i.dataset.crudites = j.code; i.checked = vc === x;
+        const sp = document.createElement('span'); sp.textContent = t(x === 'Avec' ? 'avec' : 'sans');
+        lab.append(i, sp); ch.append(lab);
+      });
+      const ec = document.createElement('span'); ec.className = 'msg-err'; ec.textContent = t('e_choix');
+      c.append(lg, ch, ec);
+      const maj = () => { c.hidden = !s.value || sansSandwich(s.value); };
+      s.addEventListener('change', maj); maj();
+      const bloc = document.createElement('div'); bloc.append(d, c); return bloc;
     }));
-    const vide = !lib(cfg.repas) && !cfg.crudites && !concernés.length;
+    const vide = !lib(cfg.repas) && !concernés.length;
     $('#section-repas').hidden = vide;
     $('#num-fin').textContent = vide ? '8' : '9';
   }
@@ -943,11 +956,14 @@
       jours: cases('jours'),
       limitation_debout: form.limitation_debout.checked, limitation_charges: form.limitation_charges.checked,
       limitation_autre: v('limitation_autre'),
-      repas: radio('repas'), crudites: radio('crudites'), sandwiches: {},
+      repas: radio('repas'), crudites: '', crudites_jours: {}, sandwiches: {},
       date_naissance: v('date_naissance'), majeur: false, consentement: form.consentement.checked, engagement: form.engagement.checked,
       site_web: form.site_web.value
     };
     $$('select[data-sandwich]', form).forEach(s => { d.sandwiches[s.dataset.sandwich] = s.value; });
+    $$('input[data-crudites]:checked', form).forEach(i => { if (!sansSandwich(d.sandwiches[i.dataset.crudites])) d.crudites_jours[i.dataset.crudites] = i.value; });
+    const vc = Object.values(d.crudites_jours);
+    d.crudites = !vc.length ? '' : vc.every(x => x === 'Avec') ? 'Avec' : vc.every(x => x === 'Sans') ? 'Sans' : 'Selon le jour';
     if (d.deja_benevole !== 'Oui') { d.team_precedente = ''; d.souhait = ''; }
     return d;
   }
@@ -961,7 +977,7 @@
     const cocher = (nom, valeurs) => $$('input[name="' + nom + '"]', form).forEach(i => { i.checked = valeurs.includes(i.value); });
     cocher('langues', d.langues || []);
     cocher('jours', d.jours || []);
-    ['deja_benevole', 'souhait', 'veut_binome', 'repas', 'crudites'].forEach(n => cocher(n, [d[n]]));
+    ['deja_benevole', 'souhait', 'veut_binome', 'repas'].forEach(n => cocher(n, [d[n]]));
     form.limitation_debout.checked = !!d.limitation_debout;
     form.limitation_charges.checked = !!d.limitation_charges;
     set('date_naissance', d.date_naissance || '');
@@ -969,6 +985,8 @@
     form.engagement.checked = !!d.engagement;
     $('#ajout_b2').checked = !!d.binome2_email;
     form._sandwichesInitiaux = d.sandwiches || {};
+    form._cruditesInitiaux = Object.assign({}, d.crudites_jours || {});
+    Object.keys(d.sandwiches || {}).forEach(k => { if (!form._cruditesInitiaux[k] && (d.crudites === 'Avec' || d.crudites === 'Sans')) form._cruditesInitiaux[k] = d.crudites; });
     remplirListes();
     set('team_precedente', d.team_precedente);
     majConditions();
@@ -1022,7 +1040,7 @@
     if (nbConv < cfg.jours_minimum) e.push('jours');
     Object.keys(d.sandwiches).forEach(k => { if (!d.sandwiches[k]) e.push('sandwich_' + k); });
     if (lib(cfg.repas) && !d.repas) e.push('repas');
-    if (cfg.crudites && !d.crudites) e.push('crudites');
+    if (cfg.crudites) Object.keys(d.sandwiches).forEach(k => { if (d.sandwiches[k] && !sansSandwich(d.sandwiches[k]) && !d.crudites_jours[k]) e.push('crudites_' + k); });
     if (!d.engagement) e.push('engagement');
     if (!d.consentement) e.push('consentement');
     return e;
@@ -1045,7 +1063,7 @@
         const cible = zone.querySelector('input, select, textarea');
         const li = document.createElement('li'); const a = document.createElement('a');
         a.href = '#' + (cible && cible.id ? cible.id : '');
-        let nom = k.indexOf('sandwich_') === 0 ? (zone.querySelector('label') || {}).textContent : t(NOMS_CHAMPS[k] || k);
+        let nom = k.indexOf('sandwich_') === 0 ? (zone.querySelector('label') || {}).textContent : k.indexOf('crudites_') === 0 ? (zone.querySelector('legend') || {}).textContent : t(NOMS_CHAMPS[k] || k);
         a.textContent = nom;
         a.addEventListener('click', ev => { ev.preventDefault(); (cible || zone).focus(); zone.scrollIntoView({ block: 'center' }); });
         li.append(a); ul.append(li);
@@ -1102,7 +1120,8 @@
     const oui = x => x === 'Oui' ? t('oui') : x === 'Non' ? t('non') : (x || '—');
     const souhait = { Rester: t('rester'), Changer: t('changer'), 'Peu importe': t('egal') }[d.souhait] || d.souhait || '—';
     const lim = [d.limitation_debout ? t('debout') : '', d.limitation_charges ? t('charges') : '', d.limitation_autre].filter(Boolean).join(' ; ') || t('aucune');
-    const sand = cfg.jours.filter(j => d.sandwiches[j.code]).map(j => [t('sandwich_q', { jour: lib(j) }), (cfg.sandwiches.find(x => x.fr === d.sandwiches[j.code]) ? lib(cfg.sandwiches.find(x => x.fr === d.sandwiches[j.code])) : d.sandwiches[j.code])]);
+    const sand = cfg.jours.filter(j => d.sandwiches[j.code]).map(j => [t('sandwich_q', { jour: lib(j) }), (cfg.sandwiches.find(x => x.fr === d.sandwiches[j.code]) ? lib(cfg.sandwiches.find(x => x.fr === d.sandwiches[j.code])) : d.sandwiches[j.code]) +
+      (d.crudites_jours[j.code] ? ', ' + t(d.crudites_jours[j.code] === 'Avec' ? 'avec' : 'sans').toLowerCase() : '')]);
     return [
       ['§', t('rs_toi')], [t('prenom') + ' / ' + t('nom'), d.prenom + ' ' + d.nom],
       [t('naissance'), d.date_naissance ? d.date_naissance.split('-').reverse().join('/') : '—'], [t('badge'), d.badge], [t('telephone'), d.telephone], ['Discord', d.discord], [t('tshirt'), d.tshirt],
@@ -1112,7 +1131,7 @@
     ].concat(d.deja_benevole === 'Oui' ? [[t('r_team'), d.team_precedente === 'Je ne sais plus' ? t('team_nsp') : d.team_precedente === 'Absent' ? t('team_absent') : d.team_precedente], [t('r_souhait'), souhait]] : [])
       .concat([['§', t('rs_binome')], [t('r_binome'), d.veut_binome === 'Oui' ? [d.binome1_email + (d.binome1_discord ? ' (' + d.binome1_discord + ')' : ''), d.binome2_email ? d.binome2_email + (d.binome2_discord ? ' (' + d.binome2_discord + ')' : '') : ''].filter(Boolean).join(' ; ') : t('aucun')],
         ['§', t('rs_dispo')], [t('r_jours'), cfg.jours.filter(j => d.jours.includes(j.code)).map(horaireJour).join(' ; ')], [t('r_engagement'), d.engagement ? t('r_engagement_oui') : '—'], [t('r_limit'), lim]])
-      .concat(lib(cfg.repas) ? [[t('r_repas'), oui(d.repas)]] : []).concat(sand).concat(cfg.crudites ? [[t('r_crudites'), d.crudites === 'Avec' ? t('avec') : d.crudites === 'Sans' ? t('sans') : '—']] : []);
+      .concat(lib(cfg.repas) ? [[t('r_repas'), oui(d.repas)]] : []).concat(sand);
   }
   function remplirListeRecap(dl, d) {
     dl.replaceChildren();
