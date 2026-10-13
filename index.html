@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inscription bénévoles</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&display=swap" rel="stylesheet">
+<script>
+  /* ================================================================
+     RÉGLAGE : colle ici l'adresse de l'application Web Apps Script
+     (elle se termine par /exec). Laissée vide, la page s'affiche en
+     mode aperçu : rien n'est envoyé.
+     ================================================================ */
+  window.ADRESSE_SCRIPT = 'https://script.google.com/macros/s/AKfycbwqhBVxKuyJ66rmx0KfwMu8Xbj6ia_4AOwjXSGAJC9kmPbFT8Ji2Hdi1dR2q8nvi03v/exec';
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #172033;
+    --muted: #556070;
+    --paper: #ffffff;
+    --bg: #e9edf3;
+    --line: #c3ccd9;
+    --pass: #ffc933;
+    --pass-ink: #3d2e00;
+    --accent: #0f6b66;
+    --accent-soft: #e2f1ef;
+    --error: #b42318;
+    --error-soft: #fdecea;
+    --radius: 10px;
+    --display: 'Bricolage Grotesque', 'Arial Narrow', sans-serif;
+    --body: 'Atkinson Hyperlegible', Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 17px/1.5 var(--body);
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 64px; }
+
+  /* ---------- Le badge ---------- */
+  .badge {
+    position: relative; margin: 24px auto 28px; max-width: 360px;
+    background: var(--paper); border-radius: 18px; overflow: hidden;
+    box-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgba(23, 32, 51, .45);
+  }
+  .badge-top {
+    background: var(--pass); color: var(--pass-ink);
+    padding: 34px 22px 14px; position: relative;
+  }
+  .badge-top::before { /* fente du cordon */
+    content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 56px; height: 10px; border-radius: 6px; background: var(--bg);
+  }
+  .badge-event { font: 800 30px/1.02 var(--display); letter-spacing: -.01em; margin: 0; }
+  .badge-sub { margin: 6px 0 0; font-size: 15px; }
+  .badge-body { padding: 18px 22px 20px; }
+  .badge-role { font-size: 14px; color: var(--muted); margin: 0; }
+  .badge-name {
+    font: 800 34px/1.05 var(--display); margin: 2px 0 0; min-height: 36px;
+    overflow-wrap: anywhere;
+  }
+  .badge-name.vide { color: var(--line); }
+  .badge-lang { display: flex; gap: 6px; margin-top: 16px; }
+  .badge-lang button {
+    font: 700 14px var(--body); padding: 6px 14px; border-radius: 999px; cursor: pointer;
+    border: 2px solid var(--ink); background: var(--paper); color: var(--ink);
+  }
+  .badge-lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  .intro { margin: 0 0 28px; }
+  .bandeau {
+    padding: 12px 16px; border-radius: var(--radius); margin: 0 0 24px;
+    background: var(--accent-soft); border-left: 4px solid var(--accent);
+  }
+  .bandeau.erreur { background: var(--error-soft); border-color: var(--error); }
+
+  /* ---------- Sections ---------- */
+  form > section { margin: 0 0 36px; }
+  h2 {
+    font: 800 24px/1.2 var(--display); margin: 0 0 4px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  h2 .num {
+    font: 700 15px var(--body); color: var(--pass-ink); background: var(--pass);
+    min-width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    transform: translateY(-2px);
+  }
+  .aide-section { color: var(--muted); margin: 0 0 14px; }
+
+  .champ { margin: 16px 0 0; }
+  .champ > label, fieldset > legend {
+    display: block; font-weight: 700; margin: 0 0 6px; padding: 0;
+  }
+  .facultatif { font-weight: 400; color: var(--muted); }
+  .aide { display: block; color: var(--muted); font-size: 15px; margin: -2px 0 8px; }
+  fieldset { border: 0; margin: 16px 0 0; padding: 0; min-width: 0; }
+  .ligne2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  .ligne-cp { display: grid; grid-template-columns: 8rem 1fr; gap: 0 14px; }
+  @media (max-width: 480px) { .ligne2 { grid-template-columns: 1fr; } }
+
+  input[type=text], input[type=email], input[type=tel], select, textarea {
+    width: 100%; font: inherit; color: inherit; background: var(--paper);
+    border: 2px solid var(--line); border-radius: var(--radius);
+    padding: 11px 12px; min-height: 48px;
+  }
+  textarea { min-height: 84px; resize: vertical; }
+  input:hover, select:hover, textarea:hover { border-color: var(--muted); }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+  /* Choix en pastilles */
+  .choix { display: flex; flex-wrap: wrap; gap: 8px; }
+  .choix.colonne { flex-direction: column; align-items: stretch; }
+  .opt {
+    position: relative; display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 14px; min-height: 48px; border-radius: var(--radius);
+    border: 2px solid var(--line); background: var(--paper); cursor: pointer;
+  }
+  .opt input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); flex: none; }
+  .opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .opt:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .opt-case { align-items: flex-start; }
+  .opt-case input { margin-top: 2px; }
+
+  .case-seule { margin: 16px 0 0; }
+  .bloc-cond { margin-top: 4px; padding: 2px 0 0 16px; border-left: 3px solid var(--pass); }
+  [hidden] { display: none !important; }
+
+  /* Erreurs */
+  .engagement { margin-top: 18px; padding: 16px 18px; border-radius: var(--radius); background: #fff6d6; border: 3px solid var(--pass); }
+  .engagement .eng-titre { font: 800 21px/1.2 var(--display); margin: 0 0 6px; color: var(--pass-ink); }
+  .engagement p { margin: 0 0 8px; }
+  .engagement ul { margin: 0 0 10px; padding-left: 22px; font-weight: 700; }
+  .engagement .opt { background: var(--paper); font-weight: 700; }
+  .engagement.en-erreur { border-color: var(--error); }
+  .engagement.rappel { margin: 0 0 22px; }
+  .lien-annuler { font: 700 16px var(--body); color: var(--ink); background: none; border: 0; padding: 4px 0; text-decoration: underline; cursor: pointer; }
+  .panneau-annuler { background: var(--paper); border: 2px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .panneau-annuler h2 { font: 800 24px/1.2 var(--display); margin: 0 0 10px; }
+  .panneau-annuler .r-actions { margin-top: 16px; }
+  .note-retrait { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 8px 12px; border-radius: 6px; margin: 10px 0 0; }
+  .msg-err { display: none; color: var(--error); font-weight: 700; font-size: 15px; margin-top: 6px; }
+  .en-erreur .msg-err { display: block; }
+  .en-erreur input[type=text], .en-erreur input[type=email], .en-erreur input[type=tel],
+  .en-erreur select, .en-erreur .opt { border-color: var(--error); }
+  #resume-erreurs ul { margin: 6px 0 0; padding-left: 20px; }
+  #resume-erreurs a { color: var(--error); font-weight: 700; }
+
+  .piege { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+  .envoyer {
+    width: 100%; font: 800 20px var(--display); padding: 16px 20px; border: 0; cursor: pointer;
+    border-radius: 14px; background: var(--ink); color: var(--paper); min-height: 60px;
+  }
+  .envoyer:hover { background: #26324d; }
+  .envoyer[disabled] { opacity: .6; cursor: wait; }
+
+  .etat { text-align: center; padding: 24px 8px; }
+  .etat .r-liste { text-align: left; }
+  .suggestion { margin: 8px 0 0; padding: 10px 12px; border-radius: var(--radius); background: #fff4d6; border-left: 4px solid var(--pass); font-weight: 700; }
+  .suggestion button { font: 700 15px var(--body); margin-left: 8px; padding: 6px 12px; border-radius: 999px; border: 2px solid var(--ink); background: var(--paper); cursor: pointer; }
+  #recap h2 { margin-bottom: 8px; }
+  .carte-email { background: var(--paper); border: 3px solid var(--pass); border-radius: 14px; padding: 16px 18px; margin: 0 0 24px; }
+  .carte-email p { margin: 0 0 10px; }
+  .r-label { color: var(--muted); font-weight: 700; }
+  .r-email { font: 800 26px/1.2 var(--display); overflow-wrap: anywhere; letter-spacing: .02em; }
+  .carte-email.en-erreur { border-color: var(--error); }
+  .r-liste { display: grid; grid-template-columns: minmax(120px, 34%) 1fr; gap: 8px 16px; margin: 0 0 24px; background: var(--paper); border-radius: 14px; padding: 16px 18px; }
+  .r-liste dt { color: var(--muted); font-weight: 700; }
+  .r-liste dd { margin: 0; overflow-wrap: anywhere; }
+  .r-liste .r-section { grid-column: 1 / -1; font: 800 18px var(--display); margin-top: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
+  .r-liste .r-section:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+  @media (max-width: 480px) { .r-liste { grid-template-columns: 1fr; gap: 2px; } .r-liste dd { margin-bottom: 8px; } }
+  .r-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; }
+  @media (max-width: 480px) { .r-actions { grid-template-columns: 1fr; } }
+  .envoyer.secondaire { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); }
+  .envoyer.secondaire:hover { background: var(--bg); }
+  .ok-email { text-align: left; background: var(--paper); border-radius: 14px; padding: 16px 18px; margin: 16px 0; border-left: 4px solid var(--pass); }
+  .ok-email p { margin: 0 0 8px; }
+  .etat h2 { justify-content: center; font-size: 28px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .badge-name { transition: color .2s; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="badge" aria-label="Badge">
+    <div class="badge-top">
+      <p class="badge-event" id="badge-event">Inscription bénévoles</p>
+      <p class="badge-sub" id="badge-sub"></p>
+    </div>
+    <div class="badge-body">
+      <p class="badge-role" data-t="role"></p>
+      <p class="badge-name vide" id="badge-name" aria-live="polite"></p>
+      <div class="badge-lang" role="group" aria-label="Langue / Taal">
+        <button type="button" data-lang="fr" aria-pressed="true">Français</button>
+        <button type="button" data-lang="nl" aria-pressed="false">Nederlands</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenu">
+    <p class="etat" id="chargement" data-t="chargement"></p>
+  </main>
+</div>
+
+<template id="tpl-recap">
+  <div id="recap" tabindex="-1">
+    <h2 data-t="r_titre"></h2>
+    <p class="aide-section" data-t="r_intro"></p>
+    <div class="carte-email">
+      <p class="r-label" data-t="r_email_label"></p>
+      <p class="r-email" id="r-email"></p>
+      <p data-t="r_email_texte"></p>
+      <p class="suggestion" id="r-suggestion" hidden></p>
+      <label class="opt opt-case" id="r-check-zone"><input type="checkbox" id="r-check"><span data-t="r_email_ok"></span></label>
+      <span class="msg-err" id="r-check-err" data-t="r_email_err"></span>
+    </div>
+    <dl class="r-liste" id="r-liste"></dl>
+    <div class="r-actions">
+      <button type="button" class="envoyer secondaire" id="r-modifier" data-t="r_modifier"></button>
+      <button type="button" class="envoyer" id="r-confirmer"></button>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-form">
+  <div class="bandeau" id="bandeau-apercu" hidden data-t="apercu"></div>
+  <div class="bandeau" id="bandeau-modif" hidden data-t="modif"></div>
+  <p class="intro" data-t="intro"></p>
+  <div class="bandeau erreur" id="resume-erreurs" tabindex="-1" hidden></div>
+
+  <form id="form" novalidate>
+    <div class="piege" aria-hidden="true">
+      <label>Site web <input type="text" name="site_web" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <section>
+      <h2><span class="num">1</span><span data-t="s_toi"></span></h2>
+      <div class="ligne2">
+        <div class="champ" data-champ="prenom">
+          <label for="prenom" data-t="prenom"></label>
+          <input type="text" id="prenom" name="prenom" autocomplete="given-name" required>
+          <span class="msg-err" data-t="e_requis"></span>
+        </div>
+        <div class="champ" data-champ="nom">
+          <label for="nom" data-t="nom"></label>
+          <input type="text" id="nom" name="nom" autocomplete="family-name" required>
+          <span class="msg-err" data-t="e_requis"></span>
+        </div>
+      </div>
+      <div class="champ" data-champ="date_naissance">
+        <label for="date_naissance" data-t="naissance"></label>
+        <span class="aide" id="aide-naissance" data-t="naissance_aide"></span>
+        <input type="date" id="date_naissance" name="date_naissance" autocomplete="bday" min="1920-01-01" aria-describedby="aide-naissance" required>
+        <span class="msg-err" id="err-naissance"></span>
+      </div>
+      <div class="champ" data-champ="badge">
+        <label for="badge" data-t="badge"></label>
+        <span class="aide" id="aide-badge" data-t="badge_aide"></span>
+        <input type="text" id="badge" name="badge" maxlength="24" aria-describedby="aide-badge" required>
+        <span class="msg-err" data-t="e_requis"></span>
+      </div>
+      <div class="champ" data-champ="email">
+        <label for="email" data-t="email"></label>
+        <span class="aide" id="aide-email" data-t="email_aide"></span>
+        <input type="email" id="email" name="email" autocomplete="email" inputmode="email" aria-describedby="aide-email" required>
+        <span class="msg-err" data-t="e_email"></span>
+        <p class="suggestion" id="suggestion-email" hidden></p>
+      </div>
+      <div class="champ" data-champ="email2">
+        <label for="email2" data-t="email2"></label>
+        <input type="email" id="email2" name="email2" autocomplete="off" inputmode="email" required>
+        <span class="msg-err" data-t="e_email2"></span>
+      </div>
+      <div class="ligne2">
+        <div class="champ" data-champ="telephone">
+          <label for="telephone" data-t="telephone"></label>
+          <input type="tel" id="telephone" name="telephone" autocomplete="tel" required>
+          <span class="msg-err" data-t="e_requis"></span>
+        </div>
+        <div class="champ" data-champ="tshirt">
+          <label for="tshirt" data-t="tshirt"></label>
+          <select id="tshirt" name="tshirt" required></select>
+          <span class="msg-err" data-t="e_choix"></span>
+        </div>
+      </div>
+      <div class="champ" data-champ="discord">
+        <label for="discord" data-t="discord"></label>
+        <span class="aide" id="aide-discord" data-t="discord_aide"></span>
+        <input type="text" id="discord" name="discord" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="aide-discord" required>
+        <span class="msg-err" data-t="e_requis"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">2</span><span data-t="s_adresse"></span></h2>
+      <p class="aide-section" data-t="adresse_aide"></p>
+      <div class="champ" data-champ="rue">
+        <label for="rue" data-t="rue"></label>
+        <input type="text" id="rue" name="rue" autocomplete="street-address" required>
+        <span class="msg-err" data-t="e_requis"></span>
+      </div>
+      <div class="ligne-cp">
+        <div class="champ" data-champ="cp">
+          <label for="cp" data-t="cp"></label>
+          <input type="text" id="cp" name="cp" autocomplete="postal-code" inputmode="numeric" required>
+          <span class="msg-err" data-t="e_requis"></span>
+        </div>
+        <div class="champ" data-champ="ville">
+          <label for="ville" data-t="ville"></label>
+          <input type="text" id="ville" name="ville" autocomplete="address-level2" required>
+          <span class="msg-err" data-t="e_requis"></span>
+        </div>
+      </div>
+      <div class="champ" data-champ="pays">
+        <label for="pays" data-t="pays"></label>
+        <input type="text" id="pays" name="pays" autocomplete="country-name" required>
+        <span class="msg-err" data-t="e_requis"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">3</span><span data-t="s_langues"></span></h2>
+      <fieldset data-champ="langues">
+        <legend data-t="langues_q"></legend>
+        <div class="choix">
+          <label class="opt"><input type="checkbox" name="langues" value="FR"><span data-t="l_fr"></span></label>
+          <label class="opt"><input type="checkbox" name="langues" value="NL"><span data-t="l_nl"></span></label>
+          <label class="opt"><input type="checkbox" name="langues" value="EN"><span data-t="l_en"></span></label>
+          <label class="opt"><input type="checkbox" name="langues" value="JA"><span data-t="l_ja"></span></label>
+        </div>
+        <span class="msg-err" data-t="e_langues"></span>
+      </fieldset>
+      <div class="champ">
+        <label for="langue_autre"><span data-t="langue_autre"></span> <span class="facultatif" data-t="facultatif"></span></label>
+        <input type="text" id="langue_autre" name="langue_autre">
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">4</span><span data-t="s_exp"></span></h2>
+      <fieldset data-champ="deja_benevole">
+        <legend data-t="deja_q"></legend>
+        <div class="choix">
+          <label class="opt"><input type="radio" name="deja_benevole" value="Oui"><span data-t="oui"></span></label>
+          <label class="opt"><input type="radio" name="deja_benevole" value="Non"><span data-t="non"></span></label>
+        </div>
+        <span class="msg-err" data-t="e_choix"></span>
+      </fieldset>
+      <div class="bloc-cond" id="bloc-ancien" hidden>
+        <div class="champ" data-champ="team_precedente">
+          <label for="team_precedente" data-t="team_q"></label>
+          <select id="team_precedente" name="team_precedente"></select>
+          <span class="msg-err" data-t="e_choix"></span>
+        </div>
+        <fieldset data-champ="souhait">
+          <legend data-t="souhait_q"></legend>
+          <span class="aide" data-t="souhait_aide"></span>
+          <div class="choix colonne">
+            <label class="opt"><input type="radio" name="souhait" value="Rester"><span data-t="rester"></span></label>
+            <label class="opt"><input type="radio" name="souhait" value="Changer"><span data-t="changer"></span></label>
+            <label class="opt"><input type="radio" name="souhait" value="Peu importe"><span data-t="egal"></span></label>
+          </div>
+          <span class="msg-err" data-t="e_choix"></span>
+        </fieldset>
+      </div>
+      <div class="champ">
+        <label for="autres_conventions"><span data-t="conventions"></span> <span class="facultatif" data-t="facultatif"></span></label>
+        <input type="text" id="autres_conventions" name="autres_conventions">
+      </div>
+      <div class="champ">
+        <label for="parrain"><span data-t="parrain"></span> <span class="facultatif" data-t="facultatif"></span></label>
+        <input type="text" id="parrain" name="parrain">
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">5</span><span data-t="s_binome"></span></h2>
+      <fieldset data-champ="veut_binome">
+        <legend data-t="binome_q"></legend>
+        <span class="aide" data-t="binome_aide"></span>
+        <div class="choix">
+          <label class="opt"><input type="radio" name="veut_binome" value="Oui"><span data-t="oui"></span></label>
+          <label class="opt"><input type="radio" name="veut_binome" value="Non"><span data-t="non"></span></label>
+        </div>
+        <span class="msg-err" data-t="e_choix"></span>
+      </fieldset>
+      <div class="bloc-cond" id="bloc-binome" hidden>
+        <div class="champ" data-champ="binome1_email">
+          <label for="binome1_email" data-t="b1_email"></label>
+          <input type="email" id="binome1_email" name="binome1_email" inputmode="email" autocomplete="off">
+          <span class="msg-err" data-t="e_binome"></span>
+        </div>
+        <div class="champ">
+          <label for="binome1_discord"><span data-t="b1_discord"></span> <span class="facultatif" data-t="facultatif"></span></label>
+          <input type="text" id="binome1_discord" name="binome1_discord" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="case-seule">
+          <label class="opt opt-case"><input type="checkbox" id="ajout_b2"><span data-t="ajout_b2"></span></label>
+        </div>
+        <div id="bloc-b2" hidden>
+          <div class="champ" data-champ="binome2_email">
+            <label for="binome2_email" data-t="b2_email"></label>
+            <input type="email" id="binome2_email" name="binome2_email" inputmode="email" autocomplete="off">
+            <span class="msg-err" data-t="e_binome"></span>
+          </div>
+          <div class="champ">
+            <label for="binome2_discord"><span data-t="b2_discord"></span> <span class="facultatif" data-t="facultatif"></span></label>
+            <input type="text" id="binome2_discord" name="binome2_discord" autocapitalize="off" spellcheck="false">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">6</span><span data-t="s_dispo"></span></h2>
+      <fieldset data-champ="jours">
+        <legend data-t="jours_q"></legend>
+        <span class="aide" id="aide-jours"></span>
+        <div class="choix colonne" id="liste-jours"></div>
+        <span class="msg-err" id="err-jours"></span>
+      </fieldset>
+      <div class="engagement" data-champ="engagement" role="note" aria-labelledby="eng-titre">
+        <p class="eng-titre" id="eng-titre" data-t="eng_titre"></p>
+        <p data-t="eng_texte"></p>
+        <ul id="eng-jours"></ul>
+        <p class="note-retrait" id="eng-retrait" hidden></p>
+        <p data-t="eng_empeche"></p>
+        <label class="opt opt-case"><input type="checkbox" name="engagement"><span data-t="eng_case"></span></label>
+        <span class="msg-err" data-t="e_engagement"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">7</span><span data-t="s_limit"></span></h2>
+      <fieldset>
+        <legend><span data-t="limit_q"></span> <span class="facultatif" data-t="facultatif"></span></legend>
+        <div class="choix colonne">
+          <label class="opt"><input type="checkbox" name="limitation_debout"><span data-t="debout"></span></label>
+          <label class="opt"><input type="checkbox" name="limitation_charges"><span data-t="charges"></span></label>
+        </div>
+      </fieldset>
+      <div class="champ">
+        <label for="limitation_autre"><span data-t="limit_autre"></span> <span class="facultatif" data-t="facultatif"></span></label>
+        <input type="text" id="limitation_autre" name="limitation_autre">
+      </div>
+    </section>
+
+    <section id="section-repas">
+      <h2><span class="num">8</span><span data-t="s_repas"></span></h2>
+      <fieldset data-champ="repas" id="bloc-repas">
+        <legend id="repas-q"></legend>
+        <div class="choix">
+          <label class="opt"><input type="radio" name="repas" value="Oui"><span data-t="oui"></span></label>
+          <label class="opt"><input type="radio" name="repas" value="Non"><span data-t="non"></span></label>
+        </div>
+        <span class="msg-err" data-t="e_choix"></span>
+      </fieldset>
+      <div id="liste-sandwiches"></div>
+      <fieldset data-champ="crudites" id="bloc-crudites">
+        <legend data-t="crudites_q"></legend>
+        <div class="choix">
+          <label class="opt"><input type="radio" name="crudites" value="Avec"><span data-t="avec"></span></label>
+          <label class="opt"><input type="radio" name="crudites" value="Sans"><span data-t="sans"></span></label>
+        </div>
+        <span class="msg-err" data-t="e_choix"></span>
+      </fieldset>
+    </section>
+
+    <section>
+      <h2><span class="num" id="num-fin">9</span><span data-t="s_fin"></span></h2>
+      <div class="choix colonne">
+        <div data-champ="consentement">
+          <label class="opt opt-case"><input type="checkbox" name="consentement"><span data-t="consent"></span></label>
+          <span class="msg-err" data-t="e_case"></span>
+        </div>
+      </div>
+    </section>
+
+    <button type="submit" class="envoyer" id="envoyer"></button>
+  </form>
+</template>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------- Textes ---------------- */
+  const T = {
+    fr: {
+      role: 'Bénévole', chargement: 'Chargement…',
+      apercu: "Aperçu : la page n'est reliée à aucune base, rien n'est envoyé.",
+      modif: "Tu modifies ton inscription. Change ce qui doit l'être, puis enregistre.",
+      intro: 'Inscris-toi comme bénévole. Compte une dizaine de minutes : tes réponses servent à composer les équipes et les horaires.',
+      facultatif: '(facultatif)', oui: 'Oui', non: 'Non',
+      s_toi: 'Toi', prenom: 'Prénom', nom: 'Nom', badge: 'Nom sur ton badge',
+      naissance: 'Date de naissance',
+      naissance_aide: 'Ta vraie date de naissance : elle est obligatoire pour des raisons légales (âge minimum de 18 ans) et pour te reconnaître d’une édition à l’autre. Elle reste dans l’équipe organisatrice.',
+      e_naissance: 'Indique ta vraie date de naissance.', e_age: 'Il faut avoir au moins 18 ans le {date}.', e_age_simple: 'Il faut avoir au moins 18 ans.',
+      badge_aide: 'Ton prénom ou ton surnom, comme tu veux qu’on t’appelle.',
+      email: 'Ton adresse email', email_aide: 'Ta propre adresse : c’est elle qui t’identifie.',
+      email2: 'Confirme ton adresse email', telephone: 'Téléphone', tshirt: 'Taille de T-shirt', choisir: 'Choisir…',
+      discord: 'Pseudo Discord', discord_aide: 'Exactement comme il s’affiche dans Discord : c’est ce nom qui apparaît sur les horaires.',
+      s_adresse: 'Adresse postale', adresse_aide: 'Pour t’envoyer nos vœux en fin d’année.',
+      rue: 'Rue et numéro', cp: 'Code postal', ville: 'Ville', pays: 'Pays', pays_defaut: 'Belgique',
+      s_langues: 'Langues', langues_q: 'Quelles langues parles-tu ?',
+      l_fr: 'Français', l_nl: 'Néerlandais', l_en: 'Anglais', l_ja: 'Japonais', langue_autre: 'Autre langue',
+      s_exp: 'Ton expérience', deja_q: 'As-tu déjà été bénévole chez nous ?',
+      team_q: 'Ta team lors de la dernière édition', team_nsp: 'Je ne sais plus', team_absent: 'J’étais absent·e',
+      souhait_q: 'Pour cette édition, tu préfères…', souhait_aide: '« Changer » veut dire : une autre team que la précédente.',
+      rester: 'Rester dans la même team', changer: 'Changer de team', egal: 'Peu importe',
+      conventions: 'Autres conventions où tu as été bénévole', parrain: 'Quelqu’un de l’équipe t’a invité·e ? Son nom',
+      s_binome: 'Binôme', binome_q: 'Veux-tu être avec un binôme ?',
+      binome_aide: 'Ton binôme doit aussi s’inscrire et indiquer ton adresse. Vous aurez toujours vos pauses en même temps.',
+      b1_email: 'Email de ton binôme', b1_discord: 'Pseudo Discord de ton binôme',
+      ajout_b2: 'Ajouter un deuxième binôme', b2_email: 'Email du deuxième binôme', b2_discord: 'Pseudo Discord du deuxième binôme',
+      s_dispo: 'Disponibilités', jours_q: 'Quels jours es-tu présent·e ?',
+      jours_aide: 'Au moins {n} jours de convention.', jours_aide1: 'Au moins 1 jour de convention.',
+      s_limit: 'Ce qu’on doit savoir', limit_q: 'Y a-t-il quelque chose que tu ne peux pas faire ?',
+      eng_titre: 'Ton engagement', eng_texte: 'En t’inscrivant, tu promets d’être là. Toute l’équipe compte sur toi pendant tout l’événement, chaque jour que tu choisis :',
+      eng_empeche: 'Un empêchement ? Préviens-nous le plus tôt possible avec le lien personnel que tu recevras par email : ta place pourra aller à quelqu’un d’autre.',
+      eng_case: 'J’ai bien lu. Je m’engage à être là aux heures indiquées, chaque jour que j’ai choisi.',
+      e_engagement: 'Coche cette case pour confirmer ton engagement.', eng_choisir: 'Choisis d’abord tes jours juste au-dessus.',
+      rap_titre: 'Rappel : on compte sur toi', rap_texte: 'Tu t’es engagé·e à être là :',
+      rap_annuler: 'Tu ne peux plus venir ? Dis-le-nous ici : ta place pourra aller à quelqu’un d’autre.', an_bouton: 'Je ne peux plus venir',
+      eng_retrait: 'Tu retires : {jours}. L’équipe comptait sur toi ce jour-là. Si tu peux le garder, ça aide beaucoup. Sinon, pas de souci : enregistre ta modification pour nous prévenir.',
+      an_titre: 'Tu ne peux plus venir ?',
+      an_texte1: 'Pas de souci, ça peut arriver. Sache juste que chaque bénévole compte : ton équipe et les horaires sont prévus avec toi, et une place est difficile à remplacer au dernier moment.',
+      an_texte2: 'Si le problème, c’est un jour ou une heure, tu peux plutôt modifier tes jours. Tu peux aussi en parler avec nous sur Discord : on trouve souvent une solution.',
+      an_texte2v: 'Si le problème, c’est un jour ou une heure, parles-en avec nous sur Discord : on trouve souvent une solution.',
+      an_garder: 'Je garde ma place', an_modifier: 'Modifier mes jours', an_continuer: 'Je dois quand même annuler',
+      an_pourquoi: 'Pourquoi ? (facultatif, ça nous aide à nous organiser)', an_r1: 'Empêchement (travail, école, famille)', an_r2: 'Raison personnelle', an_r3: 'Problème de transport', an_r4: 'Autre',
+      an_mot: 'Un mot pour l’équipe (facultatif)', an_confirmer: 'Confirmer l’annulation',
+      an_ok_titre: 'Ton annulation est enregistrée',
+      an_ok1: 'Merci de nous avoir prévenus, {prenom} : ta place peut maintenant aller à quelqu’un d’autre. Un email de confirmation va suivre.',
+      an_ok2: 'Si tu es déjà dans une équipe, préviens aussi ton ou ta référent·e sur Discord : c’est encore plus rapide pour lui ou elle.',
+      an_ok3: 'Tu changes d’avis ? Écris-nous vite sur Discord. On espère te revoir à une prochaine convention !',
+      deja_annule: 'Tu as annulé ta venue le {date}. Tu changes d’avis ? Écris-nous sur Discord.',
+      desiste: 'Tu as annulé ta venue : cette inscription ne peut plus être modifiée. Tu changes d’avis ? Écris-nous sur Discord.',
+      eng_jour: '{jour} : de {debut} à {fin}', eng_plus_tard: '{jour} : les heures te seront données plus tard',
+      n_engagement: 'Ton engagement', r_engagement: 'Engagement', r_engagement_oui: 'Oui, je serai là aux heures indiquées',
+      debout: 'Je ne peux pas rester debout longtemps', charges: 'Je ne peux pas porter de choses lourdes', limit_autre: 'Autre chose à savoir',
+      s_repas: 'Repas', sandwich_q: 'Ton sandwich pour {jour}', crudites_q: 'Avec ou sans crudités ?',
+      avec: 'Avec crudités', sans: 'Sans crudités',
+      s_fin: 'Pour terminer', majeur: 'J’aurai au moins 18 ans le {date}.', majeur_simple: 'J’ai au moins 18 ans.',
+      consent: 'J’accepte que l’équipe utilise mes données pour organiser les bénévoles de la convention.',
+      n_majeur: 'Confirmation de l’âge', n_consent: 'Accord sur l’utilisation des données',
+      envoyer: 'Envoyer mon inscription', enregistrer: 'Enregistrer mes modifications', envoi: 'Envoi en cours…',
+      e_requis: 'Ce champ est obligatoire.', e_email: 'Cette adresse email n’est pas valide.',
+      e_email2: 'Les deux adresses ne sont pas identiques.', e_choix: 'Fais un choix.',
+      e_langues: 'Coche au moins une langue, ou indique-la ci-dessous.',
+      e_binome: 'Indique une adresse valide, différente de la tienne.',
+      e_jours: 'Choisis au moins {n} jours de convention.', e_jours1: 'Choisis au moins 1 jour de convention.',
+      e_case: 'Coche cette case pour continuer.',
+      resume: 'Il reste {n} point(s) à corriger :',
+      ok_titre: 'Inscription envoyée', ok_maj_titre: 'Modifications enregistrées',
+      ok_texte: 'Merci {prenom} ! Ton inscription est bien enregistrée.',
+      ok_sans_email: 'Merci {prenom} ! Ton inscription est bien enregistrée.',
+      ok_mail1: 'Un email de confirmation va partir vers {email}, en général dans les minutes qui suivent, au plus tard sous 72 heures.',
+      ok_mail2: 'Il contient le lien personnel pour corriger tes réponses jusqu’à la répartition des équipes. Pense à regarder dans tes courriers indésirables (spams).',
+      ok_mail3: 'Rien reçu après 72 heures ? Ton adresse était sans doute mal écrite : contacte l’équipe sur Discord, ou réinscris-toi avec la bonne adresse.',
+      ok_recap: 'Ce que tu as envoyé',
+      r_titre: 'Vérifie tes réponses avant d’envoyer', r_intro: 'Relis tout : c’est avec ces informations qu’on prépare les équipes et les horaires.',
+      r_email_label: 'Ton adresse email',
+      r_email_texte: 'Vérifie-la lettre par lettre. C’est à cette adresse que tu recevras, sous 72 heures au plus tard, le lien pour corriger ton inscription, puis toutes nos informations. Une adresse mal écrite = aucun email de notre part.',
+      r_email_ok: 'Mon adresse email est correcte et je la consulte.',
+      r_email_err: 'Coche cette case après avoir vérifié ton adresse.',
+      r_modifier: 'Modifier', r_confirmer: 'Confirmer et envoyer', r_confirmer_maj: 'Confirmer et enregistrer',
+      sugg: 'Tu voulais dire {email} ?', sugg_btn: 'Oui, corriger',
+      rs_toi: 'Toi', rs_exp: 'Expérience', rs_binome: 'Binôme', rs_dispo: 'Présence et repas',
+      r_langues: 'Langues', r_deja: 'Déjà bénévole', r_team: 'Team précédente', r_souhait: 'Souhait', r_binome: 'Binôme(s)',
+      r_jours: 'Jours', r_limit: 'Limitations', r_repas: 'Repas', r_crudites: 'Crudités', r_adresse: 'Adresse', aucun: 'Aucun', aucune: 'Aucune',
+      ok_apercu: 'Aperçu : voici ce qui serait envoyé. Ouvre la console du navigateur pour voir les données.',
+      fermees: 'Les inscriptions sont fermées pour cette édition.',
+      verrouille: 'La répartition des équipes a commencé : ton inscription ne peut plus être modifiée en ligne. Contacte l’équipe sur Discord.',
+      jeton: 'Ce lien de correction n’est pas valide. Utilise le lien reçu dans ton dernier email.',
+      email_pris: 'Cette adresse email est déjà utilisée par une autre inscription.',
+      reseau: 'L’envoi n’a pas abouti. Vérifie ta connexion et réessaie.',
+      serveur: 'Le serveur a rencontré un problème. Réessaie dans quelques minutes.',
+      validation: 'Certaines réponses ont été refusées par le serveur. Vérifie les champs signalés.',
+      config: 'La page n’a pas pu charger les informations de la convention. Recharge la page dans un instant.'
+    },
+    nl: {
+      role: 'Vrijwilliger', chargement: 'Laden…',
+      apercu: 'Voorbeeld: de pagina is niet gekoppeld aan een databank, er wordt niets verstuurd.',
+      modif: 'Je past je inschrijving aan. Wijzig wat nodig is en sla op.',
+      intro: 'Schrijf je in als vrijwilliger. Reken op een tiental minuten: met je antwoorden stellen we de teams en de uurroosters samen.',
+      facultatif: '(optioneel)', oui: 'Ja', non: 'Nee',
+      s_toi: 'Over jou', prenom: 'Voornaam', nom: 'Achternaam', badge: 'Naam op je badge',
+      naissance: 'Geboortedatum',
+      naissance_aide: 'Je echte geboortedatum: verplicht om wettelijke redenen (minimumleeftijd 18 jaar) en om je van editie tot editie te herkennen. Ze blijft bij het organiserende team.',
+      e_naissance: 'Vul je echte geboortedatum in.', e_age: 'Je moet minstens 18 jaar zijn op {date}.', e_age_simple: 'Je moet minstens 18 jaar zijn.',
+      badge_aide: 'Je voornaam of bijnaam, zoals je genoemd wilt worden.',
+      email: 'Je e-mailadres', email_aide: 'Je eigen adres: hiermee herkennen we je.',
+      email2: 'Bevestig je e-mailadres', telephone: 'Telefoonnummer', tshirt: 'T-shirtmaat', choisir: 'Kies…',
+      discord: 'Discord-gebruikersnaam', discord_aide: 'Precies zoals in Discord: zo staat je naam op de uurroosters.',
+      s_adresse: 'Postadres', adresse_aide: 'Om je aan het eind van het jaar onze wensen te sturen.',
+      rue: 'Straat en huisnummer', cp: 'Postcode', ville: 'Gemeente', pays: 'Land', pays_defaut: 'België',
+      s_langues: 'Talen', langues_q: 'Welke talen spreek je?',
+      l_fr: 'Frans', l_nl: 'Nederlands', l_en: 'Engels', l_ja: 'Japans', langue_autre: 'Andere taal',
+      s_exp: 'Je ervaring', deja_q: 'Was je al eens vrijwilliger bij ons?',
+      team_q: 'Je team tijdens de vorige editie', team_nsp: 'Weet ik niet meer', team_absent: 'Ik was er niet bij',
+      souhait_q: 'Voor deze editie wil je liever…', souhait_aide: '“Veranderen” betekent: een ander team dan het vorige.',
+      rester: 'In hetzelfde team blijven', changer: 'Van team veranderen', egal: 'Maakt niet uit',
+      conventions: 'Andere conventies waar je vrijwilliger was', parrain: 'Heeft iemand van het team je uitgenodigd? Zijn of haar naam',
+      s_binome: 'Buddy', binome_q: 'Wil je samen met een buddy werken?',
+      binome_aide: 'Je buddy moet zich ook inschrijven en jouw adres opgeven. Jullie hebben altijd tegelijk pauze.',
+      b1_email: 'E-mailadres van je buddy', b1_discord: 'Discord-naam van je buddy',
+      ajout_b2: 'Een tweede buddy toevoegen', b2_email: 'E-mailadres van je tweede buddy', b2_discord: 'Discord-naam van je tweede buddy',
+      s_dispo: 'Beschikbaarheid', jours_q: 'Op welke dagen ben je er?',
+      jours_aide: 'Minstens {n} conventiedagen.', jours_aide1: 'Minstens 1 conventiedag.',
+      s_limit: 'Goed om te weten', limit_q: 'Is er iets wat je niet kunt doen?',
+      eng_titre: 'Jouw engagement', eng_texte: 'Door je in te schrijven beloof je er te zijn. Het hele team rekent op jou, het hele evenement lang, op elke dag die je kiest:',
+      eng_empeche: 'Kan je toch niet komen? Laat het ons zo snel mogelijk weten met de persoonlijke link die je per e-mail krijgt: dan kan je plaats naar iemand anders gaan.',
+      eng_case: 'Ik heb het gelezen. Ik beloof er te zijn op de aangegeven uren, op elke dag die ik kies.',
+      e_engagement: 'Vink dit vakje aan om je engagement te bevestigen.', eng_choisir: 'Kies eerst je dagen hierboven.',
+      rap_titre: 'Herinnering: we rekenen op jou', rap_texte: 'Je hebt beloofd er te zijn:',
+      rap_annuler: 'Kan je niet meer komen? Laat het ons hier weten: dan kan je plaats naar iemand anders gaan.', an_bouton: 'Ik kan niet meer komen',
+      eng_retrait: 'Je haalt weg: {jours}. Het team rekende op jou die dag. Als je die dag kan houden, helpt dat veel. Zo niet, geen probleem: sla je wijziging op om ons te verwittigen.',
+      an_titre: 'Kan je niet meer komen?',
+      an_texte1: 'Geen probleem, dat kan gebeuren. Weet wel dat elke vrijwilliger telt: je team en de uren zijn met jou gepland, en een plaats is moeilijk te vervangen op het laatste moment.',
+      an_texte2: 'Is het probleem een dag of een uur? Dan kan je ook gewoon je dagen aanpassen. Je kan er ook met ons over praten op Discord: vaak vinden we een oplossing.',
+      an_texte2v: 'Is het probleem een dag of een uur? Praat er dan met ons over op Discord: vaak vinden we een oplossing.',
+      an_garder: 'Ik houd mijn plaats', an_modifier: 'Mijn dagen aanpassen', an_continuer: 'Ik moet toch annuleren',
+      an_pourquoi: 'Waarom? (niet verplicht, het helpt ons bij de planning)', an_r1: 'Verhindering (werk, school, familie)', an_r2: 'Persoonlijke reden', an_r3: 'Vervoersprobleem', an_r4: 'Iets anders',
+      an_mot: 'Een woordje voor het team (niet verplicht)', an_confirmer: 'Annulering bevestigen',
+      an_ok_titre: 'Je annulering is ontvangen',
+      an_ok1: 'Bedankt om ons te verwittigen, {prenom}: je plaats kan nu naar iemand anders gaan. Je krijgt nog een bevestigingsmail.',
+      an_ok2: 'Zit je al in een team? Laat het dan ook aan je referent weten via Discord: zo weet die het nog sneller.',
+      an_ok3: 'Toch van gedacht veranderd? Laat het ons snel weten via Discord. We hopen je terug te zien op een volgende conventie!',
+      deja_annule: 'Je hebt je komst geannuleerd op {date}. Toch van gedacht veranderd? Laat het ons weten via Discord.',
+      desiste: 'Je hebt je komst geannuleerd: deze inschrijving kan niet meer worden aangepast. Toch van gedacht veranderd? Laat het ons weten via Discord.',
+      eng_jour: '{jour}: van {debut} tot {fin}', eng_plus_tard: '{jour}: de uren volgen later',
+      n_engagement: 'Jouw engagement', r_engagement: 'Engagement', r_engagement_oui: 'Ja, ik ben er op de aangegeven uren',
+      debout: 'Ik kan niet lang blijven staan', charges: 'Ik kan geen zware dingen dragen', limit_autre: 'Iets anders om te weten',
+      s_repas: 'Maaltijden', sandwich_q: 'Je broodje voor {jour}', crudites_q: 'Met of zonder groenten?',
+      avec: 'Met groenten', sans: 'Zonder groenten',
+      s_fin: 'Tot slot', majeur: 'Ik ben minstens 18 jaar op {date}.', majeur_simple: 'Ik ben minstens 18 jaar.',
+      consent: 'Ik ga ermee akkoord dat het team mijn gegevens gebruikt om de vrijwilligers van de conventie te organiseren.',
+      n_majeur: 'Bevestiging van je leeftijd', n_consent: 'Akkoord over het gebruik van je gegevens',
+      envoyer: 'Mijn inschrijving versturen', enregistrer: 'Mijn wijzigingen opslaan', envoi: 'Bezig met versturen…',
+      e_requis: 'Dit veld is verplicht.', e_email: 'Dit e-mailadres is niet geldig.',
+      e_email2: 'De twee adressen zijn niet hetzelfde.', e_choix: 'Maak een keuze.',
+      e_langues: 'Vink minstens één taal aan, of vul ze hieronder in.',
+      e_binome: 'Vul een geldig adres in dat verschilt van het jouwe.',
+      e_jours: 'Kies minstens {n} conventiedagen.', e_jours1: 'Kies minstens 1 conventiedag.',
+      e_case: 'Vink dit vakje aan om verder te gaan.',
+      resume: 'Nog {n} punt(en) aan te passen:',
+      ok_titre: 'Inschrijving verstuurd', ok_maj_titre: 'Wijzigingen opgeslagen',
+      ok_texte: 'Bedankt {prenom}! Je inschrijving is goed opgeslagen.',
+      ok_sans_email: 'Bedankt {prenom}! Je inschrijving is goed opgeslagen.',
+      ok_mail1: 'Er vertrekt een bevestigingsmail naar {email}, meestal binnen enkele minuten, ten laatste binnen 72 uur.',
+      ok_mail2: 'Daarin staat je persoonlijke link om je antwoorden aan te passen tot de teams worden samengesteld. Kijk ook in je spam.',
+      ok_mail3: 'Na 72 uur niets ontvangen? Dan was je adres waarschijnlijk verkeerd geschreven: neem contact op met het team via Discord, of schrijf je opnieuw in met het juiste adres.',
+      ok_recap: 'Wat je hebt verstuurd',
+      r_titre: 'Controleer je antwoorden voor je verstuurt', r_intro: 'Lees alles na: met deze gegevens stellen we de teams en de uurroosters samen.',
+      r_email_label: 'Je e-mailadres',
+      r_email_texte: 'Controleer het letter per letter. Op dit adres krijg je, ten laatste binnen 72 uur, de link om je inschrijving aan te passen, en daarna al onze informatie. Een verkeerd adres = geen enkele e-mail van ons.',
+      r_email_ok: 'Mijn e-mailadres klopt en ik lees mijn mails.',
+      r_email_err: 'Vink dit vakje aan nadat je je adres hebt gecontroleerd.',
+      r_modifier: 'Aanpassen', r_confirmer: 'Bevestigen en versturen', r_confirmer_maj: 'Bevestigen en opslaan',
+      sugg: 'Bedoelde je {email}?', sugg_btn: 'Ja, aanpassen',
+      rs_toi: 'Over jou', rs_exp: 'Ervaring', rs_binome: 'Buddy', rs_dispo: 'Aanwezigheid en maaltijden',
+      r_langues: 'Talen', r_deja: 'Al vrijwilliger geweest', r_team: 'Vorig team', r_souhait: 'Voorkeur', r_binome: 'Buddy(s)',
+      r_jours: 'Dagen', r_limit: 'Beperkingen', r_repas: 'Maaltijd', r_crudites: 'Groenten', r_adresse: 'Adres', aucun: 'Geen', aucune: 'Geen',
+      ok_apercu: 'Voorbeeld: dit zou worden verstuurd. Open de console van je browser om de gegevens te zien.',
+      fermees: 'De inschrijvingen voor deze editie zijn gesloten.',
+      verrouille: 'De teams worden al samengesteld: je inschrijving kan niet meer online worden aangepast. Neem contact op met het team via Discord.',
+      jeton: 'Deze wijzigingslink is niet geldig. Gebruik de link uit je laatste e-mail.',
+      email_pris: 'Dit e-mailadres wordt al gebruikt voor een andere inschrijving.',
+      reseau: 'Versturen is mislukt. Controleer je verbinding en probeer opnieuw.',
+      serveur: 'De server had een probleem. Probeer het over enkele minuten opnieuw.',
+      validation: 'Sommige antwoorden werden door de server geweigerd. Controleer de aangeduide velden.',
+      config: 'De pagina kon de gegevens van de conventie niet laden. Herlaad de pagina zo meteen.'
+    }
+  };
+
+  const TAILLES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL'];
+  const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const NOMS_CHAMPS = {
+    prenom: 'prenom', nom: 'nom', badge: 'badge', email: 'email', email2: 'email2', telephone: 'telephone',
+    tshirt: 'tshirt', discord: 'discord', rue: 'rue', cp: 'cp', ville: 'ville', pays: 'pays',
+    langues: 's_langues', deja_benevole: 'deja_q', team_precedente: 'team_q', souhait: 'souhait_q',
+    veut_binome: 'binome_q', binome1_email: 'b1_email', binome2_email: 'b2_email', jours: 'jours_q',
+    repas: 's_repas', crudites: 'crudites_q', majeur: 'n_majeur', consentement: 'n_consent', engagement: 'n_engagement', date_naissance: 'naissance'
+  };
+
+  // Configuration d'exemple pour l'aperçu (reprend Heroes World 10/2026)
+  const DEMO = {
+    nom: 'Heroes World 2026',
+    sous_titre: { fr: 'Bénévoles, 17 et 18 octobre 2026', nl: 'Vrijwilligers, 17 en 18 oktober 2026' },
+    ouvert: true, verrouille: false, jours_minimum: 2,
+    date_majorite: { fr: '17 octobre 2026', nl: '17 oktober 2026' },
+    repas: { fr: 'Je participe au repas des bénévoles le samedi soir', nl: 'Ik neem deel aan de vrijwilligersmaaltijd op zaterdagavond' },
+    crudites: true,
+    jours: [
+      { code: 'VEN', fr: 'Vendredi 16 octobre (montage)', nl: 'Vrijdag 16 oktober (opbouw)', type: 'montage', sandwich: false },
+      { code: 'SAM', fr: 'Samedi 17 octobre', nl: 'Zaterdag 17 oktober', type: 'convention', sandwich: true, arrivee: '7h', fin: '21h' },
+      { code: 'DIM', fr: 'Dimanche 18 octobre', nl: 'Zondag 18 oktober', type: 'convention', sandwich: true, arrivee: '7h', fin: '19h' }
+    ],
+    sandwiches: [
+      { fr: 'Américain', nl: 'Américain', jours: [] },
+      { fr: 'Thon mayonnaise', nl: 'Tonijn mayonaise', jours: [] },
+      { fr: 'Gouda jeune et mayonnaise', nl: 'Jonge gouda en mayonaise', jours: [] },
+      { fr: 'Jambon cuit et beurre', nl: 'Gekookte ham en boter', jours: [] },
+      { fr: 'Vegan : houmous et légumes grillés', nl: 'Vegan: hummus en gegrilde groenten', jours: [] },
+      { fr: 'Rien', nl: 'Niets', jours: [] }
+    ],
+    teams: ['Team Youplay', 'Team Scan', 'Team Activités', 'Team Support', 'Team MIA', 'Team Scènes', 'Team Heroes',
+      'Team Catering', 'Team Sandwich', 'Team Dédicaces', 'Team Info point', 'Gestion'].map(t => ({ fr: t, nl: t }))
+  };
+
+  /* ---------------- État ---------------- */
+  const params = new URLSearchParams(location.search);
+  const JETON = params.get('t') || '';
+  const APERCU = !window.ADRESSE_SCRIPT;
+  let langue = (params.get('lang') || (navigator.language || 'fr')).toLowerCase().startsWith('nl') ? 'nl' : 'fr';
+  let cfg = null;
+  let form = null;
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const t = (k, vars) => {
+    let s = (T[langue] && T[langue][k]) || T.fr[k] || k;
+    if (vars) Object.keys(vars).forEach(v => { s = s.split('{' + v + '}').join(vars[v]); });
+    return s;
+  };
+  const lib = o => (o && (o[langue] || o.fr)) || '';
+
+  /* ---------------- Échanges avec le script ---------------- */
+  async function appelGet(action, extra) {
+    const u = new URL(window.ADRESSE_SCRIPT);
+    u.searchParams.set('action', action);
+    Object.keys(extra || {}).forEach(k => u.searchParams.set(k, extra[k]));
+    const r = await fetch(u.toString(), { method: 'GET', redirect: 'follow' });
+    return r.json();
+  }
+  async function appelPost(corps) {
+    // Corps envoyé en texte brut : c'est ce qu'accepte une application Web Apps Script sans pré-requête.
+    const r = await fetch(window.ADRESSE_SCRIPT, { method: 'POST', redirect: 'follow', body: JSON.stringify(corps) });
+    return r.json();
+  }
+
+  /* ---------------- Langue ---------------- */
+  function appliquerLangue() {
+    document.documentElement.lang = langue;
+    $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === langue)));
+    $$('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+    if (cfg) {
+      $('#badge-event').textContent = cfg.nom || 'Inscription bénévoles';
+      $('#badge-sub').textContent = lib(cfg.sous_titre);
+      document.title = (langue === 'nl' ? 'Inschrijving vrijwilligers' : 'Inscription bénévoles') + (cfg.nom ? ' : ' + cfg.nom : '');
+    }
+    if (form) remplirListes();
+    majBadge();
+  }
+
+  function majBadge() {
+    const el = $('#badge-name');
+    const v = form && document.body.contains(form) ? form.badge.value.trim() || form.prenom.value.trim() : prenomLien;
+    el.textContent = v || (langue === 'nl' ? 'Jouw naam' : 'Ton nom');
+    el.classList.toggle('vide', !v);
+  }
+
+  /* ---------------- Construction du formulaire ---------------- */
+  function option(valeur, texte, choisi) {
+    const o = document.createElement('option');
+    o.value = valeur; o.textContent = texte; if (choisi) o.selected = true;
+    return o;
+  }
+
+  /** L'encart d'engagement : les heures de chaque jour choisi. */
+  function horaireJour(j) {
+    return j.arrivee && j.fin ? t('eng_jour', { jour: lib(j), debut: j.arrivee, fin: j.fin }) : t('eng_plus_tard', { jour: lib(j) });
+  }
+  function majEngagement() {
+    const ul = $('#eng-jours'); if (!ul) return;
+    const choisis = cfg.jours.filter(j => $$('input[name=jours]:checked').some(i => i.value === j.code));
+    ul.replaceChildren(...(choisis.length ? choisis.map(horaireJour) : [t('eng_choisir')]).map(x => { const li = document.createElement('li'); li.textContent = x; return li; }));
+    // En modification : un jour retiré reçoit un petit mot, sans dramatiser
+    const retires = cfg.jours.filter(j => joursInitiaux.indexOf(j.code) >= 0 && !choisis.includes(j));
+    const note = $('#eng-retrait');
+    if (note) { note.hidden = !retires.length; note.textContent = retires.length ? t('eng_retrait', { jours: retires.map(lib).join(', ') }) : ''; }
+  }
+
+  /* ---------------- Rappel de l'engagement et annulation (lien personnel) ---------------- */
+  let joursInitiaux = [];
+  function el(tag, attrs, ...enfants) {
+    const e = document.createElement(tag);
+    Object.entries(attrs || {}).forEach(([k, v]) => { if (k === 'onclick') e.addEventListener('click', v); else if (v != null) e.setAttribute(k, v); });
+    enfants.flat().forEach(c => { if (c != null) e.append(c); });
+    return e;
+  }
+  const txt = (tag, cle, attrs) => el(tag, Object.assign({ 'data-t': cle }, attrs || {}), t(cle));
+  function blocRappel(jours) {
+    const choisis = cfg.jours.filter(j => jours.indexOf(j.code) >= 0);
+    return el('div', { class: 'engagement rappel', id: 'rappel-engagement', role: 'note' },
+      txt('p', 'rap_titre', { class: 'eng-titre' }), txt('p', 'rap_texte'),
+      el('ul', null, choisis.map(j => el('li', null, horaireJour(j)))),
+      txt('p', 'rap_annuler'),
+      txt('button', 'an_bouton', { type: 'button', class: 'lien-annuler', id: 'btn-annuler', onclick: () => ouvrirAnnulation(!!form) }));
+  }
+  /** Le panneau d'annulation remplace la page ; « Je garde ma place » remet la page telle quelle. */
+  function ouvrirAnnulation(avecFormulaire) {
+    const main = $('#contenu');
+    const avant = Array.from(main.childNodes);
+    const revenir = () => { main.replaceChildren(...avant); window.scrollTo(0, 0); };
+    const raisons = ['Empêchement (travail, école, famille)', 'Raison personnelle', 'Problème de transport', 'Autre'];
+    const etape2 = el('div', { hidden: '' },
+      el('fieldset', null, txt('legend', 'an_pourquoi'),
+        el('div', { class: 'choix colonne' }, raisons.map((r, i) => el('label', { class: 'opt' }, el('input', { type: 'radio', name: 'an_raison', value: r }), txt('span', 'an_r' + (i + 1)))))),
+      el('div', { class: 'champ' }, el('label', { for: 'an_mot' }, t('an_mot')), el('input', { type: 'text', id: 'an_mot', maxlength: '300' })),
+      el('div', { class: 'r-actions' },
+        txt('button', 'an_garder', { type: 'button', class: 'envoyer secondaire', onclick: revenir }),
+        txt('button', 'an_confirmer', { type: 'button', class: 'envoyer', id: 'an-confirmer', onclick: async ev => {
+          const b = ev.currentTarget; b.disabled = true;
+          const raison = (document.querySelector('input[name=an_raison]:checked') || {}).value || '';
+          const motif = $('#an_mot').value.trim();
+          try {
+            const rep = APERCU ? { ok: true } : await appelPost({ action: 'desister', jeton: JETON, raison, motif });
+            if (!rep.ok) { b.disabled = false; etat(t(rep.erreur) === rep.erreur ? t('serveur') : t(rep.erreur)); return; }
+            annulationFaite();
+          } catch (e) { b.disabled = false; alert(t('reseau')); }
+        } })));
+    const panneau = el('div', { class: 'panneau-annuler', id: 'panneau-annuler', tabindex: '-1' },
+      txt('h2', 'an_titre'), txt('p', 'an_texte1'), txt('p', avecFormulaire ? 'an_texte2' : 'an_texte2v'),
+      el('div', { class: 'r-actions', id: 'an-etape1' },
+        txt('button', 'an_garder', { type: 'button', class: 'envoyer', onclick: revenir }),
+        avecFormulaire ? txt('button', 'an_modifier', { type: 'button', class: 'envoyer secondaire', onclick: () => { revenir(); const f = $('[data-champ=jours]'); if (f) f.scrollIntoView({ block: 'start' }); } }) : null,
+        txt('button', 'an_continuer', { type: 'button', class: 'lien-annuler', id: 'an-continuer', onclick: () => { $('#an-etape1').hidden = true; etape2.hidden = false; } })),
+      etape2);
+    main.replaceChildren(panneau);
+    window.scrollTo(0, 0); panneau.focus();
+  }
+  function annulationFaite() {
+    const box = el('div', { class: 'etat' }, txt('h2', 'an_ok_titre'));
+    ['an_ok1', 'an_ok2', 'an_ok3'].forEach(k => box.append(el('p', null, t(k, { prenom: prenomLien }))));
+    $('#contenu').replaceChildren(box);
+    majBadge();
+    window.scrollTo(0, 0);
+  }
+  let prenomLien = '';
+
+  function remplirListes() {
+    // T-shirt
+    const ts = form.tshirt, vTs = ts.value;
+    ts.replaceChildren(option('', t('choisir')), ...TAILLES.map(x => option(x, x, x === vTs)));
+
+    // Teams précédentes
+    const tp = form.team_precedente, vTp = tp.value;
+    tp.replaceChildren(option('', t('choisir')),
+      ...cfg.teams.map(x => option(x.fr, lib(x), x.fr === vTp)),
+      option('Je ne sais plus', t('team_nsp'), vTp === 'Je ne sais plus'),
+      option('Absent', t('team_absent'), vTp === 'Absent'));
+
+    // Jours
+    const cochés = new Set($$('input[name=jours]:checked').map(i => i.value));
+    $('#liste-jours').replaceChildren(...cfg.jours.map(j => {
+      const l = document.createElement('label'); l.className = 'opt';
+      const i = document.createElement('input'); i.type = 'checkbox'; i.name = 'jours'; i.value = j.code; i.checked = cochés.has(j.code);
+      const s = document.createElement('span'); s.textContent = lib(j);
+      l.append(i, s); return l;
+    }));
+    const n = cfg.jours_minimum;
+    $('#aide-jours').textContent = n > 1 ? t('jours_aide', { n }) : t('jours_aide1');
+    $('#err-jours').textContent = n > 1 ? t('e_jours', { n }) : t('e_jours1');
+    majEngagement();
+
+    // Repas, sandwiches, crudités
+    const aRepas = !!lib(cfg.repas);
+    $('#bloc-repas').hidden = !aRepas;
+    $('#repas-q').textContent = lib(cfg.repas);
+    $('#bloc-crudites').hidden = !cfg.crudites;
+    majSandwiches();
+
+    // Âge
+    const dm = lib(cfg.date_majorite);
+    const max = new Date(); $('#date_naissance').max = max.toISOString().slice(0, 10);
+
+    $('#envoyer').textContent = JETON ? t('enregistrer') : t('envoyer');
+    if (form.pays.value === '' || form.pays.value === T.fr.pays_defaut || form.pays.value === T.nl.pays_defaut) {
+      form.pays.value = t('pays_defaut');
+    }
+  }
+
+  function majSandwiches() {
+    const zone = $('#liste-sandwiches');
+    const avant = {};
+    $$('select[data-sandwich]', zone).forEach(s => { avant[s.dataset.sandwich] = s.value; });
+    const jours = new Set($$('input[name=jours]:checked').map(i => i.value));
+    const concernés = cfg.jours.filter(j => j.sandwich && jours.has(j.code));
+    zone.replaceChildren(...concernés.map(j => {
+      const d = document.createElement('div'); d.className = 'champ'; d.dataset.champ = 'sandwich_' + j.code;
+      const id = 'sandwich_' + j.code;
+      const l = document.createElement('label'); l.htmlFor = id; l.textContent = t('sandwich_q', { jour: lib(j) });
+      const s = document.createElement('select'); s.id = id; s.dataset.sandwich = j.code;
+      const permis = cfg.sandwiches.filter(x => !x.jours.length || x.jours.includes(j.code));
+      const v = avant[j.code] || (form._sandwichesInitiaux || {})[j.code] || '';
+      s.append(option('', t('choisir')), ...permis.map(x => option(x.fr, lib(x), x.fr === v)));
+      const e = document.createElement('span'); e.className = 'msg-err'; e.textContent = t('e_choix');
+      d.append(l, s, e); return d;
+    }));
+    const vide = !lib(cfg.repas) && !cfg.crudites && !concernés.length;
+    $('#section-repas').hidden = vide;
+    $('#num-fin').textContent = vide ? '8' : '9';
+  }
+
+  function majConditions() {
+    $('#bloc-ancien').hidden = !(form.querySelector('input[name=deja_benevole][value=Oui]').checked);
+    const b = form.querySelector('input[name=veut_binome][value=Oui]').checked;
+    $('#bloc-binome').hidden = !b;
+    $('#bloc-b2').hidden = !(b && $('#ajout_b2').checked);
+  }
+
+  /* ---------------- Lecture et remplissage ---------------- */
+  function radio(nom) { const r = form.querySelector('input[name="' + nom + '"]:checked'); return r ? r.value : ''; }
+  function cases(nom) { return $$('input[name="' + nom + '"]:checked', form).map(i => i.value); }
+
+  function lire() {
+    const v = n => (form[n] ? form[n].value.trim() : '');
+    const d = {
+      langue, prenom: v('prenom'), nom: v('nom'), badge: v('badge'), email: v('email').toLowerCase(),
+      telephone: v('telephone'), discord: v('discord').replace(/^@/, ''), tshirt: v('tshirt'),
+      rue: v('rue'), cp: v('cp'), ville: v('ville'), pays: v('pays'),
+      langues: cases('langues'), langue_autre: v('langue_autre'),
+      deja_benevole: radio('deja_benevole'), team_precedente: v('team_precedente'), souhait: radio('souhait'),
+      autres_conventions: v('autres_conventions'), parrain: v('parrain'),
+      veut_binome: radio('veut_binome'),
+      binome1_email: v('binome1_email').toLowerCase(), binome1_discord: v('binome1_discord').replace(/^@/, ''),
+      binome2_email: $('#ajout_b2').checked ? v('binome2_email').toLowerCase() : '',
+      binome2_discord: $('#ajout_b2').checked ? v('binome2_discord').replace(/^@/, '') : '',
+      jours: cases('jours'),
+      limitation_debout: form.limitation_debout.checked, limitation_charges: form.limitation_charges.checked,
+      limitation_autre: v('limitation_autre'),
+      repas: radio('repas'), crudites: radio('crudites'), sandwiches: {},
+      date_naissance: v('date_naissance'), majeur: false, consentement: form.consentement.checked, engagement: form.engagement.checked,
+      site_web: form.site_web.value
+    };
+    $$('select[data-sandwich]', form).forEach(s => { d.sandwiches[s.dataset.sandwich] = s.value; });
+    if (d.deja_benevole !== 'Oui') { d.team_precedente = ''; d.souhait = ''; }
+    return d;
+  }
+
+  function remplir(d) {
+    const set = (n, val) => { if (form[n] && val != null) form[n].value = val; };
+    ['prenom', 'nom', 'badge', 'email', 'telephone', 'discord', 'tshirt', 'rue', 'cp', 'ville', 'pays',
+      'langue_autre', 'autres_conventions', 'parrain', 'binome1_email', 'binome1_discord',
+      'binome2_email', 'binome2_discord', 'limitation_autre'].forEach(n => set(n, d[n]));
+    set('email2', d.email);
+    const cocher = (nom, valeurs) => $$('input[name="' + nom + '"]', form).forEach(i => { i.checked = valeurs.includes(i.value); });
+    cocher('langues', d.langues || []);
+    cocher('jours', d.jours || []);
+    ['deja_benevole', 'souhait', 'veut_binome', 'repas', 'crudites'].forEach(n => cocher(n, [d[n]]));
+    form.limitation_debout.checked = !!d.limitation_debout;
+    form.limitation_charges.checked = !!d.limitation_charges;
+    set('date_naissance', d.date_naissance || '');
+    form.consentement.checked = !!d.consentement;
+    form.engagement.checked = !!d.engagement;
+    $('#ajout_b2').checked = !!d.binome2_email;
+    form._sandwichesInitiaux = d.sandwiches || {};
+    remplirListes();
+    set('team_precedente', d.team_precedente);
+    majConditions();
+    majBadge();
+  }
+
+  /* ---------------- Validation ---------------- */
+  /* Date « 17 octobre 2026 » / « 17 oktober 2026 » → Date */
+  const MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const MOIS_NL = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  function dateTexte(txt) {
+    const m = String(txt || '').toLowerCase().match(/(\d{1,2})\s+([a-zéû]+)\s+(\d{4})/);
+    if (!m) return null;
+    let i = MOIS_FR.indexOf(m[2]); if (i < 0) i = MOIS_NL.indexOf(m[2]); if (i < 0) return null;
+    return new Date(Number(m[3]), i, Number(m[1]));
+  }
+  function ageLe(naissance, jour) {
+    const m = String(naissance || '').match(/^(\d{4})-(\d{2})-(\d{2})$/); if (!m || !jour) return null;
+    let a = jour.getFullYear() - Number(m[1]);
+    if (jour.getMonth() + 1 < Number(m[2]) || (jour.getMonth() + 1 === Number(m[2]) && jour.getDate() < Number(m[3]))) a--;
+    return a;
+  }
+  /** '' si la date est bonne, sinon le message d'erreur */
+  function erreurNaissance(d) {
+    const m = String(d.date_naissance || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m || Number(m[1]) < 1920 || new Date(d.date_naissance) > new Date()) return t('e_naissance');
+    const jour = dateTexte(cfg.date_majorite && cfg.date_majorite.fr) || new Date();
+    const age = ageLe(d.date_naissance, jour);
+    if (age === null || age < 18) return dateTexte(cfg.date_majorite && cfg.date_majorite.fr) ? t('e_age', { date: lib(cfg.date_majorite) }) : t('e_age_simple');
+    return '';
+  }
+
+  function valider(d) {
+    const e = [];
+    const en = erreurNaissance(d);
+    $('#err-naissance').textContent = en;
+    if (en) e.push('date_naissance'); else d.majeur = true;
+    ['prenom', 'nom', 'badge', 'telephone', 'discord', 'rue', 'cp', 'ville', 'pays'].forEach(k => { if (!d[k]) e.push(k); });
+    if (!RE_EMAIL.test(d.email)) e.push('email');
+    else if (form.email2.value.trim().toLowerCase() !== d.email) e.push('email2');
+    if (!d.tshirt) e.push('tshirt');
+    if (!d.langues.length && !d.langue_autre) e.push('langues');
+    if (!d.deja_benevole) e.push('deja_benevole');
+    if (d.deja_benevole === 'Oui') { if (!d.team_precedente) e.push('team_precedente'); if (!d.souhait) e.push('souhait'); }
+    if (!d.veut_binome) e.push('veut_binome');
+    if (d.veut_binome === 'Oui') {
+      if (!RE_EMAIL.test(d.binome1_email) || d.binome1_email === d.email) e.push('binome1_email');
+      if ($('#ajout_b2').checked && d.binome2_email && (!RE_EMAIL.test(d.binome2_email) || d.binome2_email === d.email)) e.push('binome2_email');
+    }
+    const nbConv = cfg.jours.filter(j => j.type === 'convention' && d.jours.includes(j.code)).length;
+    if (nbConv < cfg.jours_minimum) e.push('jours');
+    Object.keys(d.sandwiches).forEach(k => { if (!d.sandwiches[k]) e.push('sandwich_' + k); });
+    if (lib(cfg.repas) && !d.repas) e.push('repas');
+    if (cfg.crudites && !d.crudites) e.push('crudites');
+    if (!d.engagement) e.push('engagement');
+    if (!d.consentement) e.push('consentement');
+    return e;
+  }
+
+  function afficherErreurs(liste, messageServeur) {
+    $$('.en-erreur', form).forEach(el => el.classList.remove('en-erreur'));
+    const resume = $('#resume-erreurs');
+    if (!liste.length && !messageServeur) { resume.hidden = true; return; }
+    liste.forEach(k => { const el = form.querySelector('[data-champ="' + k + '"]'); if (el) el.classList.add('en-erreur'); });
+    resume.replaceChildren();
+    const p = document.createElement('p'); p.style.margin = '0';
+    p.textContent = messageServeur || t('resume', { n: liste.length });
+    resume.append(p);
+    if (liste.length) {
+      const ul = document.createElement('ul');
+      liste.forEach(k => {
+        const zone = form.querySelector('[data-champ="' + k + '"]');
+        if (!zone) return;
+        const cible = zone.querySelector('input, select, textarea');
+        const li = document.createElement('li'); const a = document.createElement('a');
+        a.href = '#' + (cible && cible.id ? cible.id : '');
+        let nom = k.indexOf('sandwich_') === 0 ? (zone.querySelector('label') || {}).textContent : t(NOMS_CHAMPS[k] || k);
+        a.textContent = nom;
+        a.addEventListener('click', ev => { ev.preventDefault(); (cible || zone).focus(); zone.scrollIntoView({ block: 'center' }); });
+        li.append(a); ul.append(li);
+      });
+      resume.append(ul);
+    }
+    resume.hidden = false;
+    resume.focus();
+    resume.scrollIntoView({ block: 'start' });
+  }
+
+  /* ---------------- Fautes de frappe dans l'adresse email ---------------- */
+  const DOMAINES = ['gmail.com', 'hotmail.com', 'hotmail.be', 'hotmail.fr', 'outlook.com', 'outlook.be', 'outlook.fr', 'live.be', 'live.com', 'live.fr',
+    'yahoo.com', 'yahoo.fr', 'icloud.com', 'me.com', 'msn.com', 'skynet.be', 'telenet.be', 'proximus.be', 'voo.be', 'scarlet.be', 'gmx.com', 'laposte.net', 'orange.fr', 'free.fr', 'protonmail.com', 'proton.me', 'student.uclouvain.be', 'ulb.be'];
+  function distance(a, b) {
+    const m = a.length, n = b.length, d = Array.from({ length: m + 1 }, (_, i) => [i].concat(new Array(n).fill(0)));
+    for (let j = 1; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1] ? d[i - 2][j - 2] + 1 : Infinity);
+    return d[m][n];
+  }
+  /** Propose une correction quand le domaine ressemble à un domaine courant (gmial.com, hotmail.con, gmail.cm…). */
+  function suggestionEmail(email) {
+    const m = String(email || '').trim().toLowerCase().match(/^([^@\s]+)@([^@\s]+)$/);
+    if (!m) return null;
+    let dom = m[2].replace(/,/g, '.').replace(/\.+$/, '');
+    if (DOMAINES.indexOf(dom) >= 0) return dom === m[2] ? null : m[1] + '@' + dom;
+    if (!/\./.test(dom)) { const x = DOMAINES.find(d => d.split('.')[0] === dom); if (x) return m[1] + '@' + x; }
+    let meilleur = null, dmin = 3;
+    DOMAINES.forEach(d => { const x = distance(dom, d); if (x < dmin) { dmin = x; meilleur = d; } });
+    if (meilleur && dmin <= (dom.length > 8 ? 2 : 1)) return m[1] + '@' + meilleur;
+    // Extension seule : .con, .cm, .comm, .bee…
+    const ext = dom.match(/^(.*)\.(con|cm|co|comm|cpm|vom|om|ocm|bee|bz|fe|frr)$/);
+    if (ext) { const bonne = { con: 'com', cm: 'com', co: 'com', comm: 'com', cpm: 'com', vom: 'com', om: 'com', ocm: 'com', bee: 'be', bz: 'be', fe: 'fr', frr: 'fr' }[ext[2]]; return m[1] + '@' + ext[1] + '.' + bonne; }
+    return null;
+  }
+  function afficherSuggestion(zone, email, appliquer) {
+    const sug = suggestionEmail(email);
+    zone.replaceChildren();
+    zone.hidden = !sug;
+    if (!sug) return;
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = t('sugg_btn');
+    b.addEventListener('click', () => appliquer(sug));
+    zone.append(document.createTextNode(t('sugg', { email: sug })), b);
+  }
+  function majSuggestionForm() {
+    afficherSuggestion($('#suggestion-email'), form.email.value, sug => { form.email.value = sug; form.email2.value = sug; majSuggestionForm(); });
+  }
+
+  /* ---------------- Récapitulatif avant envoi ---------------- */
+  function lignesRecap(d) {
+    const jn = c => { const j = cfg.jours.find(x => x.code === c); return j ? lib(j) : c; };
+    const L = { FR: t('l_fr'), NL: t('l_nl'), EN: t('l_en'), JA: t('l_ja') };
+    const oui = x => x === 'Oui' ? t('oui') : x === 'Non' ? t('non') : (x || '—');
+    const souhait = { Rester: t('rester'), Changer: t('changer'), 'Peu importe': t('egal') }[d.souhait] || d.souhait || '—';
+    const lim = [d.limitation_debout ? t('debout') : '', d.limitation_charges ? t('charges') : '', d.limitation_autre].filter(Boolean).join(' ; ') || t('aucune');
+    const sand = cfg.jours.filter(j => d.sandwiches[j.code]).map(j => [t('sandwich_q', { jour: lib(j) }), (cfg.sandwiches.find(x => x.fr === d.sandwiches[j.code]) ? lib(cfg.sandwiches.find(x => x.fr === d.sandwiches[j.code])) : d.sandwiches[j.code])]);
+    return [
+      ['§', t('rs_toi')], [t('prenom') + ' / ' + t('nom'), d.prenom + ' ' + d.nom],
+      [t('naissance'), d.date_naissance ? d.date_naissance.split('-').reverse().join('/') : '—'], [t('badge'), d.badge], [t('telephone'), d.telephone], ['Discord', d.discord], [t('tshirt'), d.tshirt],
+      [t('r_adresse'), [d.rue, d.cp + ' ' + d.ville, d.pays].filter(x => x.trim()).join(', ')],
+      [t('r_langues'), d.langues.map(x => L[x] || x).concat(d.langue_autre ? [d.langue_autre] : []).join(', ')],
+      ['§', t('rs_exp')], [t('r_deja'), oui(d.deja_benevole)]
+    ].concat(d.deja_benevole === 'Oui' ? [[t('r_team'), d.team_precedente === 'Je ne sais plus' ? t('team_nsp') : d.team_precedente === 'Absent' ? t('team_absent') : d.team_precedente], [t('r_souhait'), souhait]] : [])
+      .concat([['§', t('rs_binome')], [t('r_binome'), d.veut_binome === 'Oui' ? [d.binome1_email + (d.binome1_discord ? ' (' + d.binome1_discord + ')' : ''), d.binome2_email ? d.binome2_email + (d.binome2_discord ? ' (' + d.binome2_discord + ')' : '') : ''].filter(Boolean).join(' ; ') : t('aucun')],
+        ['§', t('rs_dispo')], [t('r_jours'), cfg.jours.filter(j => d.jours.includes(j.code)).map(horaireJour).join(' ; ')], [t('r_engagement'), d.engagement ? t('r_engagement_oui') : '—'], [t('r_limit'), lim]])
+      .concat(lib(cfg.repas) ? [[t('r_repas'), oui(d.repas)]] : []).concat(sand).concat(cfg.crudites ? [[t('r_crudites'), d.crudites === 'Avec' ? t('avec') : d.crudites === 'Sans' ? t('sans') : '—']] : []);
+  }
+  function remplirListeRecap(dl, d) {
+    dl.replaceChildren();
+    lignesRecap(d).forEach(([k, v]) => {
+      if (k === '§') { const x = document.createElement('div'); x.className = 'r-section'; x.textContent = v; dl.append(x); return; }
+      const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v || '—'; dl.append(dt, dd);
+    });
+  }
+  function afficherRecap(d) {
+    const main = $('#contenu');
+    let r = $('#recap');
+    if (!r) { main.append($('#tpl-recap').content.cloneNode(true)); r = $('#recap'); }
+    $$('[data-t]', r).forEach(el => { el.textContent = t(el.dataset.t); });
+    form.hidden = true; $('#resume-erreurs').hidden = true;
+    r.hidden = false;
+    $('#r-email').textContent = d.email;
+    const zone = r.querySelector('.carte-email');
+    zone.classList.remove('en-erreur'); $('#r-check').checked = false;
+    afficherSuggestion($('#r-suggestion'), d.email, sug => { form.email.value = sug; form.email2.value = sug; afficherRecap(lire()); });
+    remplirListeRecap($('#r-liste'), d);
+    $('#r-confirmer').textContent = JETON ? t('r_confirmer_maj') : t('r_confirmer');
+    $('#r-modifier').onclick = () => { r.hidden = true; form.hidden = false; form.email.focus(); window.scrollTo(0, 0); majSuggestionForm(); };
+    $('#r-check').onchange = () => zone.classList.remove('en-erreur');
+    $('#r-confirmer').onclick = () => {
+      if (!$('#r-check').checked) { zone.classList.add('en-erreur'); $('#r-check').focus(); return; }
+      envoyerVraiment(d);
+    };
+    window.scrollTo(0, 0); r.focus();
+  }
+
+  /* ---------------- Envoi ---------------- */
+  async function envoyer(ev) {
+    ev.preventDefault();
+    const d = lire();
+    const erreurs = valider(d);
+    if (erreurs.length) { afficherErreurs(erreurs); return; }
+    afficherErreurs([]);
+    afficherRecap(d);
+  }
+  async function envoyerVraiment(d) {
+    const bouton = $('#r-confirmer');
+    bouton.disabled = true; bouton.textContent = t('envoi');
+    try {
+      if (APERCU) {
+        console.log('Données qui seraient envoyées :', d);
+        await new Promise(r => setTimeout(r, 400));
+        succes({ ok: true, mode: JETON ? 'maj' : 'nouveau', prenom: d.prenom, email: d.email, apercu: true }, d);
+        return;
+      }
+      const rep = await appelPost({ action: 'inscrire', jeton: JETON, donnees: d });
+      if (rep.ok) { succes(rep, d); return; }
+      $('#recap').hidden = true; form.hidden = false;
+      if (rep.erreur === 'validation') afficherErreurs(rep.champs || [], t('validation'));
+      else afficherErreurs([], t(rep.erreur) === rep.erreur ? t('serveur') : t(rep.erreur));
+    } catch (err) {
+      $('#recap').hidden = true; form.hidden = false;
+      afficherErreurs([], t('reseau'));
+    }
+    bouton.disabled = false; bouton.textContent = JETON ? t('r_confirmer_maj') : t('r_confirmer');
+  }
+
+  function succes(rep, d) {
+    const main = $('#contenu');
+    const box = document.createElement('div'); box.className = 'etat';
+    const h = document.createElement('h2'); h.textContent = rep.mode === 'maj' ? t('ok_maj_titre') : t('ok_titre');
+    const p = document.createElement('p');
+    const vars = { prenom: rep.prenom || '', email: rep.email || '' };
+    p.textContent = rep.apercu ? t('ok_apercu') : t('ok_texte', vars);
+    box.append(h, p);
+    // L'email de confirmation : quand, où le chercher, que faire s'il n'arrive pas
+    const m = document.createElement('div'); m.className = 'ok-email';
+    ['ok_mail1', 'ok_mail2', 'ok_mail3'].forEach(k => { const x = document.createElement('p'); x.textContent = t(k, vars); m.append(x); });
+    box.append(m);
+    if (d) {
+      const h3 = document.createElement('h2'); h3.style.fontSize = '20px'; h3.style.justifyContent = 'flex-start'; h3.textContent = t('ok_recap');
+      const dl = document.createElement('dl'); dl.className = 'r-liste'; remplirListeRecap(dl, d);
+      box.append(h3, dl);
+    }
+    main.replaceChildren(box);
+    window.scrollTo(0, 0);
+    h.setAttribute('tabindex', '-1'); h.focus();
+  }
+
+  function etat(message) {
+    const p = document.createElement('p'); p.className = 'bandeau erreur'; p.textContent = message;
+    $('#contenu').replaceChildren(p);
+  }
+
+  /* ---------------- Démarrage ---------------- */
+  async function demarrer() {
+    $$('[data-lang]').forEach(b => b.addEventListener('click', () => { langue = b.dataset.lang; appliquerLangue(); }));
+    appliquerLangue();
+
+    try {
+      if (APERCU) cfg = DEMO;
+      else {
+        const rep = await appelGet('config');
+        if (!rep.ok) throw new Error(rep.erreur);
+        cfg = rep.config;
+      }
+    } catch (err) { etat(t('config')); return; }
+
+    let donnees = null;
+    if (JETON && !APERCU) {
+      try {
+        const rep = await appelGet('charger', { t: JETON });
+        if (!rep.ok) { etat(t(rep.erreur) === rep.erreur ? t('serveur') : t(rep.erreur)); appliquerLangue(); return; }
+        const lg = rep.langue || (rep.donnees || {}).langue;
+        if (lg === 'nl' || lg === 'fr') langue = lg;
+        prenomLien = rep.prenom || (rep.donnees || {}).prenom || '';
+        if (rep.desiste) { appliquerLangue(); etat(t('deja_annule', { date: rep.desiste_le || '' })); return; }
+        if (rep.verrouille) {
+          // Plus de modification en ligne, mais le rappel et l'annulation restent possibles
+          appliquerLangue(); etat(t('verrouille'));
+          $('#contenu').append(blocRappel(rep.donnees.jours || []));
+          return;
+        }
+        donnees = rep.donnees;
+        joursInitiaux = (donnees.jours || []).slice();
+      } catch (err) { etat(t('reseau')); return; }
+    } else if (!cfg.ouvert && !APERCU) {
+      appliquerLangue(); etat(t('fermees')); return;
+    }
+
+    $('#contenu').replaceChildren($('#tpl-form').content.cloneNode(true));
+    form = $('#form');
+    $('#bandeau-apercu').hidden = !APERCU;
+    $('#bandeau-modif').hidden = !JETON;
+
+    form.addEventListener('change', ev => {
+      if (ev.target.name === 'jours') { majSandwiches(); majEngagement(); }
+      majConditions();
+      const zone = ev.target.closest('[data-champ]');
+      if (zone) zone.classList.remove('en-erreur');
+    });
+    form.addEventListener('input', ev => {
+      if (ev.target.name === 'badge' || ev.target.name === 'prenom') majBadge();
+      const zone = ev.target.closest('[data-champ]');
+      if (zone) zone.classList.remove('en-erreur');
+    });
+    // Le résumé disparaît dès que tout est corrigé
+    const nettoyerResume = () => { if (!form.querySelector('.en-erreur')) $('#resume-erreurs').hidden = true; };
+    form.addEventListener('input', nettoyerResume);
+    form.addEventListener('change', nettoyerResume);
+    form.addEventListener('submit', envoyer);
+    form.email.addEventListener('blur', majSuggestionForm);
+    form.email.addEventListener('input', () => { if (!$('#suggestion-email').hidden) majSuggestionForm(); });
+
+    appliquerLangue();
+    if (donnees) {
+      remplir(donnees);
+      $('#bandeau-modif').after(blocRappel(donnees.jours || []));
+      majEngagement();
+    }
+    majConditions();
+  }
+
+  demarrer();
+})();
+</script>
+</body>
+</html>
