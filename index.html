@@ -184,6 +184,8 @@
   @media (max-width: 480px) { .r-actions { grid-template-columns: 1fr; } }
   .envoyer.secondaire { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); }
   .envoyer.secondaire:hover { background: var(--bg); }
+  .note-verrou { background: #fff6d6; border-left: 4px solid #ffc933; padding: 8px 12px; border-radius: 6px; font-size: 15px; margin: 8px 0; }
+  .note-validation { background: #eef3ff; border-left: 4px solid #4f6bed; padding: 10px 14px; border-radius: 6px; font-weight: 600; }
   .ok-email { text-align: left; background: var(--paper); border-radius: 14px; padding: 16px 18px; margin: 16px 0; border-left: 4px solid var(--pass); }
   .ok-email p { margin: 0 0 8px; }
   .etat h2 { justify-content: center; font-size: 28px; }
@@ -294,6 +296,7 @@
         <div class="champ" data-champ="tshirt">
           <label for="tshirt" data-t="tshirt"></label>
           <select id="tshirt" name="tshirt" required></select>
+          <p class="note-verrou" id="note-tshirt" hidden></p>
           <span class="msg-err" data-t="e_choix"></span>
         </div>
       </div>
@@ -469,6 +472,7 @@
         </div>
         <span class="msg-err" data-t="e_choix"></span>
       </fieldset>
+      <p class="note-verrou" id="note-sandwiches" hidden></p>
       <div id="liste-sandwiches"></div>
     </section>
 
@@ -564,6 +568,12 @@
       ok_mail1: 'Un email de confirmation va partir vers {email}, en général dans les minutes qui suivent, au plus tard sous 72 heures.',
       ok_mail2: 'Il contient le lien personnel pour corriger tes réponses jusqu’à la répartition des équipes. Pense à regarder dans tes courriers indésirables (spams).',
       ok_mail3: 'Rien reçu après 72 heures ? Ton adresse était sans doute mal écrite : contacte l’équipe sur Discord, ou réinscris-toi avec la bonne adresse.',
+      ok_valider: 'Prochaine étape : l’équipe des bénévoles va examiner ton inscription. Tu recevras un email quand elle sera validée.',
+      tshirt_verrou_new: 'Les t-shirts ont déjà été commandés. Nous avons prévu des tailles en plus, mais nous ne pouvons pas garantir la tienne : il faudra peut-être prendre une taille au-dessus ou en dessous.',
+      tshirt_verrou_edit: 'Les t-shirts ont déjà été commandés : ta taille ne peut plus être modifiée.',
+      sandw_verrou_new: 'La liste des sandwichs a déjà été envoyée au traiteur. Un sandwich sera prévu pour toi, mais nous ne pouvons plus garantir lequel.',
+      sandw_verrou_edit: 'La liste des sandwichs a déjà été envoyée au traiteur : tes choix ne peuvent plus être modifiés. Pour un jour ajouté, un sandwich sera prévu, sans choix possible.',
+      sandw_sans_choix: 'Un sandwich sera prévu pour toi ce jour-là (sans choix possible).',
       ok_recap: 'Ce que tu as envoyé',
       r_titre: 'Vérifie tes réponses avant d’envoyer', r_intro: 'Relis tout : c’est avec ces informations qu’on prépare les équipes et les horaires.',
       r_email_label: 'Ton adresse email',
@@ -657,6 +667,12 @@
       ok_mail1: 'Er vertrekt een bevestigingsmail naar {email}, meestal binnen enkele minuten, ten laatste binnen 72 uur.',
       ok_mail2: 'Daarin staat je persoonlijke link om je antwoorden aan te passen tot de teams worden samengesteld. Kijk ook in je spam.',
       ok_mail3: 'Na 72 uur niets ontvangen? Dan was je adres waarschijnlijk verkeerd geschreven: neem contact op met het team via Discord, of schrijf je opnieuw in met het juiste adres.',
+      ok_valider: 'Volgende stap: het vrijwilligersteam bekijkt je inschrijving. Je krijgt een e-mail zodra ze bevestigd is.',
+      tshirt_verrou_new: 'De t-shirts zijn al besteld. We hebben extra maten voorzien, maar we kunnen jouw maat niet garanderen: misschien moet je een maat groter of kleiner nemen.',
+      tshirt_verrou_edit: 'De t-shirts zijn al besteld: je maat kan niet meer worden aangepast.',
+      sandw_verrou_new: 'De lijst met broodjes is al naar de cateraar gestuurd. Er wordt een broodje voor je voorzien, maar we kunnen niet meer garanderen welk.',
+      sandw_verrou_edit: 'De lijst met broodjes is al naar de cateraar gestuurd: je keuzes kunnen niet meer worden aangepast. Voor een toegevoegde dag wordt een broodje voorzien, zonder keuze.',
+      sandw_sans_choix: 'Er wordt die dag een broodje voor je voorzien (geen keuze meer mogelijk).',
       ok_recap: 'Wat je hebt verstuurd',
       r_titre: 'Controleer je antwoorden voor je verstuurt', r_intro: 'Lees alles na: met deze gegevens stellen we de teams en de uurroosters samen.',
       r_email_label: 'Je e-mailadres',
@@ -850,6 +866,11 @@
     // T-shirt
     const ts = form.tshirt, vTs = ts.value;
     ts.replaceChildren(option('', t('choisir')), ...TAILLES.map(x => option(x, x, x === vTs)));
+    // T-shirts déjà commandés : taille bloquée pour un inscrit, avertissement pour un nouveau
+    const tsBloque = !!(cfg.verrou_tshirts && JETON && form._tshirtInitial);
+    ts.disabled = tsBloque;
+    $('#note-tshirt').hidden = !cfg.verrou_tshirts;
+    $('#note-tshirt').textContent = cfg.verrou_tshirts ? t(tsBloque ? 'tshirt_verrou_edit' : 'tshirt_verrou_new') : '';
 
     // Teams précédentes
     const tp = form.team_precedente, vTp = tp.value;
@@ -905,6 +926,16 @@
       const v = avant[j.code] || (form._sandwichesInitiaux || {})[j.code] || '';
       s.append(option('', t('choisir')), ...permis.map(x => option(x.fr, lib(x), x.fr === v)));
       const e = document.createElement('span'); e.className = 'msg-err'; e.textContent = t('e_choix');
+      if (cfg.verrou_sandwiches) {
+        // Liste envoyée au traiteur : le choix déjà fait est affiché bloqué ; sinon un sandwich est prévu, sans choix
+        const initial = JETON ? String((form._sandwichesInitiaux || {})[j.code] || '') : '';
+        if (!initial || /^sans choix/i.test(initial)) {
+          const p = document.createElement('p'); p.className = 'aide'; p.textContent = t('sandw_sans_choix');
+          d.append(l, p); return d;
+        }
+        if (!permis.some(x => x.fr === initial)) s.append(option(initial, initial, true));
+        s.value = initial; s.disabled = true; s.removeAttribute('data-sandwich');
+      }
       d.append(l, s, e);
       if (!cfg.crudites) return d;
       // Avec ou sans crudités, pour ce sandwich-là (pas de question pour « Rien »)
@@ -920,11 +951,14 @@
       });
       const ec = document.createElement('span'); ec.className = 'msg-err'; ec.textContent = t('e_choix');
       c.append(lg, ch, ec);
+      if (cfg.verrou_sandwiches) $$('input', c).forEach(i => { i.disabled = true; });
       const maj = () => { c.hidden = !s.value || sansSandwich(s.value); };
       s.addEventListener('change', maj); maj();
       const bloc = document.createElement('div'); bloc.append(d, c); return bloc;
     }));
     const vide = !lib(cfg.repas) && !concernés.length;
+    $('#note-sandwiches').hidden = !(cfg.verrou_sandwiches && concernés.length);
+    $('#note-sandwiches').textContent = cfg.verrou_sandwiches ? t(JETON && Object.keys(form._sandwichesInitiaux || {}).length ? 'sandw_verrou_edit' : 'sandw_verrou_new') : '';
     $('#section-repas').hidden = vide;
     $('#num-fin').textContent = vide ? '8' : '9';
   }
@@ -985,6 +1019,7 @@
     form.engagement.checked = !!d.engagement;
     $('#ajout_b2').checked = !!d.binome2_email;
     form._sandwichesInitiaux = d.sandwiches || {};
+    form._tshirtInitial = d.tshirt || '';
     form._cruditesInitiaux = Object.assign({}, d.crudites_jours || {});
     Object.keys(d.sandwiches || {}).forEach(k => { if (!form._cruditesInitiaux[k] && (d.crudites === 'Avec' || d.crudites === 'Sans')) form._cruditesInitiaux[k] = d.crudites; });
     remplirListes();
@@ -1201,6 +1236,7 @@
     const vars = { prenom: rep.prenom || '', email: rep.email || '' };
     p.textContent = rep.apercu ? t('ok_apercu') : t('ok_texte', vars);
     box.append(h, p);
+    if (rep.a_valider && rep.mode !== 'maj') { const v = document.createElement('p'); v.className = 'note-validation'; v.textContent = t('ok_valider'); box.append(v); }
     // L'email de confirmation : quand, où le chercher, que faire s'il n'arrive pas
     const m = document.createElement('div'); m.className = 'ok-email';
     ['ok_mail1', 'ok_mail2', 'ok_mail3'].forEach(k => { const x = document.createElement('p'); x.textContent = t(k, vars); m.append(x); });
