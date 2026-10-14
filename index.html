@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Outil bénévoles, version 2.3.1 (14/10/2026). Code.gs, Admin.gs, App.html et la page d'inscription (index.html) vont ensemble. -->
+<!-- Outil bénévoles, version 2.3.3 (14/10/2026). Code.gs, Admin.gs, App.html et la page d'inscription (index.html) vont ensemble. -->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -185,6 +185,8 @@
   @media (max-width: 480px) { .r-actions { grid-template-columns: 1fr; } }
   .envoyer.secondaire { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); }
   .envoyer.secondaire:hover { background: var(--bg); }
+  .opt-oblig { opacity: .9; }
+  .opt-oblig input:disabled { accent-color: var(--ink, #172033); }
   .note-verrou { background: #fff6d6; border-left: 4px solid #ffc933; padding: 8px 12px; border-radius: 6px; font-size: 15px; margin: 8px 0; }
   .note-validation { background: #eef3ff; border-left: 4px solid #4f6bed; padding: 10px 14px; border-radius: 6px; font-weight: 600; }
   .ok-email { text-align: left; background: var(--paper); border-radius: 14px; padding: 16px 18px; margin: 16px 0; border-left: 4px solid var(--pass); }
@@ -412,7 +414,7 @@
           <label for="binome1_discord"><span data-t="b1_discord"></span> <span class="facultatif" data-t="facultatif"></span></label>
           <input type="text" id="binome1_discord" name="binome1_discord" autocapitalize="off" spellcheck="false">
         </div>
-        <div class="case-seule">
+        <div class="case-seule" id="ligne-b2" hidden>
           <label class="opt opt-case"><input type="checkbox" id="ajout_b2"><span data-t="ajout_b2"></span></label>
         </div>
         <div id="bloc-b2" hidden>
@@ -526,6 +528,7 @@
       ajout_b2: 'Ajouter un deuxième binôme', b2_email: 'Email du deuxième binôme', b2_discord: 'Pseudo Discord du deuxième binôme',
       s_dispo: 'Disponibilités', jours_q: 'Quels jours es-tu présent·e ?',
       jours_aide: 'Au moins {n} jours de convention.', jours_aide1: 'Au moins 1 jour de convention.',
+      jours_aide_oblig: '{jours} : présence obligatoire. Les autres jours sont en plus, si tu peux (le montage ne compte pas comme jour de convention).', et: ' et ', jour_oblig: 'obligatoire', jour_montage: 'facultatif', jour_facultatif: 'facultatif',
       s_limit: 'Ce qu’on doit savoir', limit_q: 'Y a-t-il quelque chose que tu ne peux pas faire ?',
       eng_titre: 'Ton engagement', eng_texte: 'En t’inscrivant, tu promets d’être là. Toute l’équipe compte sur toi pendant tout l’événement, chaque jour que tu choisis :',
       eng_empeche: 'Un empêchement ? Préviens-nous le plus tôt possible avec le lien personnel que tu recevras par email : ta place pourra aller à quelqu’un d’autre.',
@@ -570,6 +573,7 @@
       ok_mail2: 'Il contient le lien personnel pour corriger tes réponses jusqu’à la répartition des équipes. Pense à regarder dans tes courriers indésirables (spams).',
       ok_mail3: 'Rien reçu après 72 heures ? Ton adresse était sans doute mal écrite : contacte l’équipe sur Discord, ou réinscris-toi avec la bonne adresse.',
       ok_valider: 'Prochaine étape : l’équipe des bénévoles va examiner ton inscription. Tu recevras un email quand elle sera validée.',
+      tshirt_souhait: 'Taille de T-shirt souhaitée (pas garantie)',
       tshirt_verrou_new: 'Les t-shirts ont déjà été commandés. Nous avons prévu des tailles en plus, mais nous ne pouvons pas garantir la tienne : il faudra peut-être prendre une taille au-dessus ou en dessous.',
       tshirt_verrou_edit: 'Les t-shirts ont déjà été commandés : ta taille ne peut plus être modifiée.',
       sandw_verrou_new: 'La liste des sandwichs a déjà été envoyée au traiteur. Un sandwich sera prévu pour toi, mais nous ne pouvons plus garantir lequel.',
@@ -591,6 +595,8 @@
       verrouille: 'La répartition des équipes a commencé : ton inscription ne peut plus être modifiée en ligne. Contacte l’équipe sur Discord.',
       jeton: 'Ce lien de correction n’est pas valide. Utilise le lien reçu dans ton dernier email.',
       email_pris: 'Cette adresse email est déjà utilisée par une autre inscription.',
+      deja_inscrit: 'Cette adresse email est déjà inscrite. Pour voir ou modifier ton inscription, utilise ton lien personnel : on vient de te le renvoyer par email (regarde aussi dans les spams).',
+      trop: 'Beaucoup d’inscriptions arrivent en même temps. Réessaie dans quelques minutes.',
       reseau: 'L’envoi n’a pas abouti. Vérifie ta connexion et réessaie.',
       serveur: 'Le serveur a rencontré un problème. Réessaie dans quelques minutes.',
       validation: 'Certaines réponses ont été refusées par le serveur. Vérifie les champs signalés.',
@@ -625,6 +631,7 @@
       ajout_b2: 'Een tweede buddy toevoegen', b2_email: 'E-mailadres van je tweede buddy', b2_discord: 'Discord-naam van je tweede buddy',
       s_dispo: 'Beschikbaarheid', jours_q: 'Op welke dagen ben je er?',
       jours_aide: 'Minstens {n} conventiedagen.', jours_aide1: 'Minstens 1 conventiedag.',
+      jours_aide_oblig: '{jours}: aanwezigheid verplicht. De andere dagen zijn extra, als je kunt (de opbouw telt niet als conventiedag).', et: ' en ', jour_oblig: 'verplicht', jour_montage: 'facultatief', jour_facultatif: 'facultatief',
       s_limit: 'Goed om te weten', limit_q: 'Is er iets wat je niet kunt doen?',
       eng_titre: 'Jouw engagement', eng_texte: 'Door je in te schrijven beloof je er te zijn. Het hele team rekent op jou, het hele evenement lang, op elke dag die je kiest:',
       eng_empeche: 'Kan je toch niet komen? Laat het ons zo snel mogelijk weten met de persoonlijke link die je per e-mail krijgt: dan kan je plaats naar iemand anders gaan.',
@@ -669,6 +676,7 @@
       ok_mail2: 'Daarin staat je persoonlijke link om je antwoorden aan te passen tot de teams worden samengesteld. Kijk ook in je spam.',
       ok_mail3: 'Na 72 uur niets ontvangen? Dan was je adres waarschijnlijk verkeerd geschreven: neem contact op met het team via Discord, of schrijf je opnieuw in met het juiste adres.',
       ok_valider: 'Volgende stap: het vrijwilligersteam bekijkt je inschrijving. Je krijgt een e-mail zodra ze bevestigd is.',
+      tshirt_souhait: 'Gewenste T-shirtmaat (niet gegarandeerd)',
       tshirt_verrou_new: 'De t-shirts zijn al besteld. We hebben extra maten voorzien, maar we kunnen jouw maat niet garanderen: misschien moet je een maat groter of kleiner nemen.',
       tshirt_verrou_edit: 'De t-shirts zijn al besteld: je maat kan niet meer worden aangepast.',
       sandw_verrou_new: 'De lijst met broodjes is al naar de cateraar gestuurd. Er wordt een broodje voor je voorzien, maar we kunnen niet meer garanderen welk.',
@@ -690,6 +698,8 @@
       verrouille: 'De teams worden al samengesteld: je inschrijving kan niet meer online worden aangepast. Neem contact op met het team via Discord.',
       jeton: 'Deze wijzigingslink is niet geldig. Gebruik de link uit je laatste e-mail.',
       email_pris: 'Dit e-mailadres wordt al gebruikt voor een andere inschrijving.',
+      deja_inscrit: 'Dit e-mailadres is al ingeschreven. Gebruik je persoonlijke link om je inschrijving te bekijken of aan te passen: we hebben hem je net opnieuw gemaild (kijk ook in je spam).',
+      trop: 'Er komen veel inschrijvingen tegelijk binnen. Probeer het over een paar minuten opnieuw.',
       reseau: 'Versturen is mislukt. Controleer je verbinding en probeer opnieuw.',
       serveur: 'De server had een probleem. Probeer het over enkele minuten opnieuw.',
       validation: 'Sommige antwoorden werden door de server geweigerd. Controleer de aangeduide velden.',
@@ -871,6 +881,7 @@
     const tsBloque = !!(cfg.verrou_tshirts && JETON && form._tshirtInitial);
     ts.disabled = tsBloque;
     $('#note-tshirt').hidden = !cfg.verrou_tshirts;
+    $('label[for=tshirt]').textContent = cfg.verrou_tshirts && !tsBloque ? t('tshirt_souhait') : t('tshirt');
     $('#note-tshirt').textContent = cfg.verrou_tshirts ? t(tsBloque ? 'tshirt_verrou_edit' : 'tshirt_verrou_new') : '';
 
     // Teams précédentes
@@ -882,14 +893,18 @@
 
     // Jours
     const cochés = new Set($$('input[name=jours]:checked').map(i => i.value));
+    const oblig = joursObligatoires();
     $('#liste-jours').replaceChildren(...cfg.jours.map(j => {
-      const l = document.createElement('label'); l.className = 'opt';
-      const i = document.createElement('input'); i.type = 'checkbox'; i.name = 'jours'; i.value = j.code; i.checked = cochés.has(j.code);
-      const s = document.createElement('span'); s.textContent = lib(j);
+      const l = document.createElement('label'); l.className = 'opt' + (oblig.includes(j.code) ? ' opt-oblig' : '');
+      const i = document.createElement('input'); i.type = 'checkbox'; i.name = 'jours'; i.value = j.code;
+      i.checked = oblig.includes(j.code) || cochés.has(j.code);
+      if (oblig.includes(j.code)) i.disabled = true;   // jours obligatoires : cochés d'office
+      const s = document.createElement('span'); s.textContent = lib(j) + (oblig.includes(j.code) ? ' · ' + t('jour_oblig') : j.type === 'montage' ? ' · ' + t('jour_montage') : ' · ' + t('jour_facultatif'));
       l.append(i, s); return l;
     }));
     const n = cfg.jours_minimum;
-    $('#aide-jours').textContent = n > 1 ? t('jours_aide', { n }) : t('jours_aide1');
+    const nomsOblig = cfg.jours.filter(j => oblig.includes(j.code)).map(lib);
+    $('#aide-jours').textContent = nomsOblig.length ? t('jours_aide_oblig', { jours: nomsOblig.join(t('et')) }) : (n > 1 ? t('jours_aide', { n }) : t('jours_aide1'));
     $('#err-jours').textContent = n > 1 ? t('e_jours', { n }) : t('e_jours1');
     majEngagement();
 
@@ -907,6 +922,13 @@
     if (form.pays.value === '' || form.pays.value === T.fr.pays_defaut || form.pays.value === T.nl.pays_defaut) {
       form.pays.value = t('pays_defaut');
     }
+  }
+
+  /** Jours obligatoires : les N derniers jours de convention (N = minimum demandé) ; le montage n'en fait jamais partie. */
+  function joursObligatoires() {
+    const conv = cfg.jours.filter(j => j.type !== 'montage');
+    const n = Math.min(Number(cfg.jours_minimum) || 0, conv.length);
+    return n ? conv.slice(conv.length - n).map(j => j.code) : [];
   }
 
   const sansSandwich = nom => !nom || /^(rien|niets|aucun|pas de sandwich)/i.test(String(nom).trim());
@@ -1019,6 +1041,7 @@
     form.consentement.checked = !!d.consentement;
     form.engagement.checked = !!d.engagement;
     $('#ajout_b2').checked = !!d.binome2_email;
+    $('#ligne-b2').hidden = !d.binome2_email;   // plus de 2e binôme, sauf inscription ancienne qui en avait un
     form._sandwichesInitiaux = d.sandwiches || {};
     form._tshirtInitial = d.tshirt || '';
     form._cruditesInitiaux = Object.assign({}, d.crudites_jours || {});
@@ -1073,7 +1096,7 @@
       if ($('#ajout_b2').checked && d.binome2_email && (!RE_EMAIL.test(d.binome2_email) || d.binome2_email === d.email)) e.push('binome2_email');
     }
     const nbConv = cfg.jours.filter(j => j.type === 'convention' && d.jours.includes(j.code)).length;
-    if (nbConv < cfg.jours_minimum) e.push('jours');
+    if (nbConv < cfg.jours_minimum || joursObligatoires().some(c => !d.jours.includes(c))) e.push('jours');
     Object.keys(d.sandwiches).forEach(k => { if (!d.sandwiches[k]) e.push('sandwich_' + k); });
     if (lib(cfg.repas) && !d.repas) e.push('repas');
     if (cfg.crudites) Object.keys(d.sandwiches).forEach(k => { if (d.sandwiches[k] && !sansSandwich(d.sandwiches[k]) && !d.crudites_jours[k]) e.push('crudites_' + k); });
@@ -1329,6 +1352,6 @@
   demarrer();
 })();
 </script>
-<p style="text-align:center;color:#8a93a3;font-size:12px;margin:24px 0 12px">version 2.3.1</p>
+<p style="text-align:center;color:#8a93a3;font-size:12px;margin:24px 0 12px">version 2.3.3</p>
 </body>
 </html>
