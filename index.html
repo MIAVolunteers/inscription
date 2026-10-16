@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Outil bénévoles, version 2.3.8 (16/10/2026). Code.gs, Admin.gs, App.html et la page d'inscription (index.html) vont ensemble. -->
+<!-- Outil bénévoles, version 2.4.1 (16/10/2026). Code.gs, Admin.gs, App.html et la page d'inscription (index.html) vont ensemble. -->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -142,6 +142,28 @@
   .engagement .opt { background: var(--paper); font-weight: 700; }
   .engagement.en-erreur { border-color: var(--error); }
   .engagement.rappel { margin: 0 0 22px; }
+  .horaire { margin: 0 0 22px; padding: 16px 18px; border-radius: var(--radius); background: var(--paper); border: 3px solid var(--accent); }
+  .horaire h2 { font: 800 22px/1.2 var(--display); margin: 0 0 2px; }
+  .horaire .h-team { color: var(--muted); margin: 0 0 10px; }
+  .h-jours { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .h-jours button { font: 700 15px var(--body); border: 2px solid var(--line); background: var(--paper); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+  .h-jours button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .h-seg { display: grid; grid-template-columns: 96px 1fr; gap: 2px 10px; padding: 7px 8px; border-radius: 8px; }
+  .h-seg + .h-seg { border-top: 1px solid #edf0f4; }
+  .h-seg.poste, .h-seg.mission { background: var(--accent-soft); }
+  .h-seg.actuel { outline: 3px solid var(--pass); }
+  .h-seg .h-h { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .h-seg .h-info { grid-column: 2; font-size: 14px; color: var(--muted); }
+  .h-seg .h-lien { grid-column: 2; justify-self: start; font: 700 14px var(--body); color: var(--accent); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+  .h-now { display: inline-block; margin-left: 6px; font-size: 12px; background: var(--pass); color: var(--pass-ink); border-radius: 999px; padding: 0 8px; }
+  .h-plan { margin-top: 14px; }
+  .h-plan .h-tete { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .h-plan .h-tete b { font: 800 18px var(--display); margin-right: auto; }
+  .h-plan .h-tete button { font: 700 14px var(--body); border: 2px solid var(--line); background: var(--paper); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+  .h-plan .h-tete button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .h-cadre { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #f1f3f6; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+  .h-cadre canvas { width: 100%; height: 100%; display: block; }
+  .h-aide { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
   .lien-annuler { font: 700 16px var(--body); color: var(--ink); background: none; border: 0; padding: 4px 0; text-decoration: underline; cursor: pointer; }
   .panneau-annuler { background: var(--paper); border: 2px solid var(--line); border-radius: var(--radius); padding: 20px; }
   .panneau-annuler h2 { font: 800 24px/1.2 var(--display); margin: 0 0 10px; }
@@ -600,7 +622,11 @@
       reseau: 'L’envoi n’a pas abouti. Vérifie ta connexion et réessaie.',
       serveur: 'Le serveur a rencontré un problème. Réessaie dans quelques minutes.',
       validation: 'Certaines réponses ont été refusées par le serveur. Vérifie les champs signalés.',
-      config: 'La page n’a pas pu charger les informations de la convention. Recharge la page dans un instant.'
+      config: 'La page n’a pas pu charger les informations de la convention. Recharge la page dans un instant.',
+      hor_titre: 'Ton horaire', hor_team: 'Team {team}', hor_pause: 'Pause : libre dans l’événement', hor_commun: 'Moment commun de la team',
+      hor_mission: 'Mission', hor_support: 'Support : reste joignable, on peut t’envoyer en mission', hor_sans: 'Pas encore de poste ce jour-là',
+      hor_maintenant: 'maintenant', hor_voir: 'Voir sur le plan', hor_plan: 'Où aller', hor_zoom: 'Ma zone', hor_tout: 'Plan entier',
+      hor_horsplan: 'Ce poste n’est pas encore placé sur le plan : demande à ton ou ta référent·e.', hor_aide: 'Recharge la page pour voir les derniers changements.'
     },
     nl: {
       role: 'Vrijwilliger', chargement: 'Laden…',
@@ -703,7 +729,11 @@
       reseau: 'Versturen is mislukt. Controleer je verbinding en probeer opnieuw.',
       serveur: 'De server had een probleem. Probeer het over enkele minuten opnieuw.',
       validation: 'Sommige antwoorden werden door de server geweigerd. Controleer de aangeduide velden.',
-      config: 'De pagina kon de gegevens van de conventie niet laden. Herlaad de pagina zo meteen.'
+      config: 'De pagina kon de gegevens van de conventie niet laden. Herlaad de pagina zo meteen.',
+      hor_titre: 'Jouw uurrooster', hor_team: 'Team {team}', hor_pause: 'Pauze: vrij op het evenement', hor_commun: 'Gezamenlijk moment van het team',
+      hor_mission: 'Opdracht', hor_support: 'Support: blijf bereikbaar, je kunt een opdracht krijgen', hor_sans: 'Nog geen post die dag',
+      hor_maintenant: 'nu', hor_voir: 'Bekijk op het plan', hor_plan: 'Waar naartoe', hor_zoom: 'Mijn zone', hor_tout: 'Volledig plan',
+      hor_horsplan: 'Deze post staat nog niet op het plan: vraag het aan je referent.', hor_aide: 'Herlaad de pagina om de laatste wijzigingen te zien.'
     }
   };
 
@@ -749,6 +779,7 @@
   let langue = (params.get('lang') || (navigator.language || 'fr')).toLowerCase().startsWith('nl') ? 'nl' : 'fr';
   let cfg = null;
   let form = null;
+  let horaireLien = null;
 
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
@@ -824,6 +855,147 @@
     return e;
   }
   const txt = (tag, cle, attrs) => el(tag, Object.assign({ 'data-t': cle }, attrs || {}), t(cle));
+
+  /* ---------------- Mon horaire (lien personnel, quand les éditeurs l'ont rendu visible) ---------------- */
+  const fmtH = x => { const hh = Math.floor(x + 1e-9), m = Math.round((x - hh) * 60); return hh + 'h' + (m ? String(m).padStart(2, '0') : ''); };
+  const MOIS_H = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  function estAujourdhui(j) {
+    const d = new Date(), cle = (d.getDate() + ' ' + MOIS_H[d.getMonth()]).toLowerCase();
+    return (' ' + String((j && (j.fr || j.libelle)) || '').toLowerCase() + ' ').indexOf(' ' + cle + ' ') >= 0;
+  }
+  function blocHoraire(hor) {
+    if (!hor || !hor.jours || !hor.jours.length) return null;
+    const jourCfg = c => cfg.jours.find(x => x.code === c) || { code: c, fr: c };
+    let jour = (hor.jours.find(j => estAujourdhui(jourCfg(j.code))) || hor.jours[0]).code;
+    let zoneVue = '', tout = false;
+    const boite = el('section', { class: 'horaire', 'aria-labelledby': 'h-titre' });
+    const dessiner = () => {
+      const j = hor.jours.find(x => x.code === jour);
+      const maintenant = new Date(), hNow = maintenant.getHours() + maintenant.getMinutes() / 60;
+      const auj = estAujourdhui(jourCfg(jour));
+      const libSeg = s => s.k === 'poste' ? s.txt : s.k === 'mission' ? t('hor_mission') + (s.txt ? ' : ' + s.txt : '') : s.k === 'commun' ? t('hor_commun') + (s.txt ? ' (' + s.txt + ')' : '') : t('hor_' + s.k);
+      const actuel = auj ? j.segments.find(s => hNow >= s.debut && hNow < s.fin) : null;
+      // Zone montrée par défaut : celle du moment, sinon la prochaine
+      const prochain = j.segments.find(s => s.zone && (!auj || s.fin > hNow));
+      if (!zoneVue || !j.segments.some(s => s.zone === zoneVue)) zoneVue = (actuel && actuel.zone) || (prochain && prochain.zone) || '';
+      const cv = document.createElement('canvas');
+      const plan = hor.plan && zoneVue ? el('div', { class: 'h-plan' },
+        el('div', { class: 'h-tete' }, el('b', null, t('hor_plan') + ' : ' + ((hor.plan.zones.find(z => z.id === zoneVue) || {}).nom || '')),
+          el('button', { type: 'button', 'aria-pressed': String(!tout), onclick: () => { tout = false; dessiner(); } }, t('hor_zoom')),
+          el('button', { type: 'button', 'aria-pressed': String(tout), onclick: () => { tout = true; dessiner(); } }, t('hor_tout'))),
+        el('div', { class: 'h-cadre' }, cv)) : null;
+      boite.replaceChildren(
+        el('h2', { id: 'h-titre' }, t('hor_titre')),
+        el('p', { class: 'h-team' }, t('hor_team', { team: hor.team })),
+        hor.jours.length > 1 ? el('div', { class: 'h-jours', role: 'group' }, hor.jours.map(x => el('button', { type: 'button', 'aria-pressed': String(x.code === jour), onclick: () => { jour = x.code; zoneVue = ''; dessiner(); } }, lib(jourCfg(x.code)) || x.code))) : el('p', null, el('b', null, lib(jourCfg(jour)))),
+        el('div', null, j.segments.map(s => el('div', { class: 'h-seg ' + s.k + (s === actuel ? ' actuel' : '') },
+          el('span', { class: 'h-h' }, fmtH(s.debut) + '-' + fmtH(s.fin)),
+          el('span', null, el('b', null, libSeg(s)), s === actuel ? el('span', { class: 'h-now' }, t('hor_maintenant')) : null),
+          s.info ? el('span', { class: 'h-info' }, s.info) : null,
+          s.zone && hor.plan && s.zone !== zoneVue ? el('button', { type: 'button', class: 'h-lien', onclick: () => { zoneVue = s.zone; tout = false; dessiner(); } }, t('hor_voir')) : null,
+          s.k === 'poste' && !s.zone ? el('span', { class: 'h-info' }, t('hor_horsplan')) : null))),
+        plan,
+        el('p', { class: 'h-aide' }, t('hor_aide')));
+      if (plan) requestAnimationFrame(() => miniPlan(cv, hor.plan, zoneVue, tout));
+    };
+    dessiner();
+    return boite;
+  }
+
+  // Le plan : le fond officiel, l'illustration calée pièce par pièce, et seulement les zones de la personne
+  const IMGS = {};
+  function chargerImage(url) {
+    if (!IMGS[url]) IMGS[url] = new Promise(res => {
+      const essai = cors => { const i = new Image(); if (cors) i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => cors ? essai(false) : res(null); i.src = url; };
+      essai(true);
+    });
+    return IMGS[url];
+  }
+  function affine(s, d) {
+    const ax = s[1][0] - s[0][0], ay = s[1][1] - s[0][1], bx = s[2][0] - s[0][0], by = s[2][1] - s[0][1], den = ax * by - bx * ay;
+    if (Math.abs(den) < 1e-9) return null;
+    const X1 = d[1][0] - d[0][0], Y1 = d[1][1] - d[0][1], X2 = d[2][0] - d[0][0], Y2 = d[2][1] - d[0][1];
+    const a = (X1 * by - X2 * ay) / den, c = (X2 * ax - X1 * bx) / den, b = (Y1 * by - Y2 * ay) / den, e = (Y2 * ax - Y1 * bx) / den;
+    return [a, b, c, e, d[0][0] - a * s[0][0] - c * s[0][1], d[0][1] - b * s[0][0] - e * s[0][1]];
+  }
+  const bil = (q, s, u) => [0, 1].map(k => (1 - s) * (1 - u) * q[0][k] + s * (1 - u) * q[1][k] + s * u * q[2][k] + (1 - s) * u * q[3][k]);
+  function piece(ctx, img, src, dst, base) {
+    const n = 6;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const c = (q, a, b) => bil(q, a / n, b / n);
+      const S4 = [c(src, i, j), c(src, i + 1, j), c(src, i + 1, j + 1), c(src, i, j + 1)], D4 = [c(dst, i, j), c(dst, i + 1, j), c(dst, i + 1, j + 1), c(dst, i, j + 1)];
+      [[0, 1, 2], [0, 2, 3]].forEach(tr => {
+        const s = tr.map(k => S4[k]), d = tr.map(k => D4[k]), m = affine(s, d); if (!m) return;
+        const cx = (d[0][0] + d[1][0] + d[2][0]) / 3, cy = (d[0][1] + d[1][1] + d[2][1]) / 3;
+        ctx.save(); ctx.setTransform(...base); ctx.beginPath();
+        d.forEach((p, k) => { const dx = p[0] - cx, dy = p[1] - cy, l = Math.hypot(dx, dy) || 1, x = p[0] + dx / l, y = p[1] + dy / l; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+        ctx.closePath(); ctx.clip();
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]); ctx.drawImage(img, 0, 0); ctx.restore();
+      });
+    }
+  }
+  async function miniPlan(cv, pl, zid, tout) {
+    const [fond, calque] = await Promise.all([chargerImage(pl.fond), chargerImage(pl.calque)]);
+    if (!fond || !cv.isConnected) return;
+    const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect();
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    const W = fond.naturalWidth, H = fond.naturalHeight, cpx = W * (Number(pl.carre) || 3) / (Number(pl.largeurM) || 817), cols = Math.ceil(W / cpx);
+    const cellules = id => { const out = []; String((pl.zones.find(z => z.id === id) || {}).cells || '').split(',').filter(Boolean).forEach(x => { const [a, n] = x.split('.'); const d = parseInt(a, 36), k = n ? parseInt(n, 36) : 1; for (let i = 0; i < k; i++) out.push(d + i); }); return out; };
+    const cs = cellules(zid);
+    let b;
+    if (tout || !cs.length) {
+      const xs = [], ys = []; pl.pieces.forEach(p => p.dst.forEach(q => { xs.push(q[0] * W); ys.push(q[1] * H); })); cs.forEach(i => { xs.push((i % cols) * cpx); ys.push(Math.floor(i / cols) * cpx); });
+      b = xs.length ? [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] : [0, 0, W, H];
+    } else {
+      const xs = cs.map(i => (i % cols) * cpx), ys = cs.map(i => Math.floor(i / cols) * cpx), m = 45 / (Number(pl.largeurM) || 817) * W;
+      b = [Math.min(...xs) - m, Math.min(...ys) - m, Math.max(...xs) + cpx + m, Math.max(...ys) + cpx + m];
+    }
+    const cw = cv.width, ch = cv.height, z = Math.min(cw / (b[2] - b[0]), ch / (b[3] - b[1]));
+    const ox = (b[0] + b[2]) / 2 - cw / z / 2, oy = (b[1] + b[3]) / 2 - ch / z / 2;
+    const base = [z, 0, 0, z, -ox * z, -oy * z];
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#f1f3f6'; ctx.fillRect(0, 0, cw, ch);
+    ctx.setTransform(...base); ctx.drawImage(fond, 0, 0, W, H);
+    if (calque) {
+      ctx.globalAlpha = pl.opacite !== undefined ? Number(pl.opacite) : 0.85;
+      const iw = calque.naturalWidth, ih = calque.naturalHeight;
+      pl.pieces.forEach(p => {
+        const d = p.dst.map(q => [q[0] * W, q[1] * H]);
+        if (Math.max(...d.map(q => q[0])) < ox || Math.min(...d.map(q => q[0])) > ox + cw / z || Math.max(...d.map(q => q[1])) < oy || Math.min(...d.map(q => q[1])) > oy + ch / z) return;
+        piece(ctx, calque, p.src.map(q => [q[0] * iw, q[1] * ih]), d, base);
+      });
+      ctx.globalAlpha = 1;
+    }
+    // Sa zone, bien visible
+    ctx.setTransform(...base);
+    const zone = new Path2D(); cs.forEach(i => zone.rect((i % cols) * cpx, Math.floor(i / cols) * cpx, cpx, cpx));
+    ctx.fillStyle = 'rgba(214,64,159,.45)'; ctx.fill(zone);
+    const ens = new Set(cs), bord = new Path2D();
+    cs.forEach(i => { const c = i % cols, x = c * cpx, y = Math.floor(i / cols) * cpx;
+      if (!ens.has(i - cols)) { bord.moveTo(x, y); bord.lineTo(x + cpx, y); } if (!ens.has(i + cols)) { bord.moveTo(x, y + cpx); bord.lineTo(x + cpx, y + cpx); }
+      if (c === 0 || !ens.has(i - 1)) { bord.moveTo(x, y); bord.lineTo(x, y + cpx); } if (c === cols - 1 || !ens.has(i + 1)) { bord.moveTo(x + cpx, y); bord.lineTo(x + cpx, y + cpx); } });
+    ctx.strokeStyle = '#d6409f'; ctx.lineWidth = 3 * dpr / z; ctx.stroke(bord);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const ec = (x, y) => [(x - ox) * z, (y - oy) * z];
+    // Points utiles
+    const ICONES = { qg: '🏠', sandwich: '🥪', stock: '📦', secours: '⛑️', wc: '🚻', info: 'ℹ️', sas: '🚪', autre: '📍' };
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    (pl.points || []).forEach(p => {
+      const [x, y] = ec(p.x * W, p.y * H); if (x < 0 || y < 0 || x > cw || y > ch) return;
+      ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.beginPath(); ctx.arc(x, y, 13 * dpr, 0, 7); ctx.fill(); ctx.strokeStyle = '#172033'; ctx.lineWidth = dpr; ctx.stroke();
+      ctx.font = (17 * dpr) + 'px sans-serif'; ctx.fillStyle = '#000'; ctx.fillText(ICONES[p.icone] || '📍', x, y + dpr);
+    });
+    // Nom de la zone
+    if (cs.length) {
+      // Étiquette au-dessus de la zone, pour ne pas la cacher
+      let sx = 0, haut = Infinity; cs.forEach(i => { sx += (i % cols + 0.5) * cpx; haut = Math.min(haut, Math.floor(i / cols) * cpx); });
+      const [x, y0] = ec(sx / cs.length, haut), y = Math.max(16 * dpr, y0 - 18 * dpr), nom = (pl.zones.find(q => q.id === zid) || {}).nom || '';
+      ctx.font = '700 ' + (14 * dpr) + 'px Arial'; const tw = ctx.measureText(nom).width + 14 * dpr;
+      ctx.fillStyle = '#d6409f'; ctx.beginPath(); ctx.rect(x - tw / 2, y - 12 * dpr, tw, 24 * dpr); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.fillText(nom, x, y + dpr);
+    }
+  }
+
   function blocRappel(jours) {
     const choisis = cfg.jours.filter(j => jours.indexOf(j.code) >= 0);
     return el('div', { class: 'engagement rappel', id: 'rappel-engagement', role: 'note' },
@@ -1306,10 +1478,12 @@
         if (rep.verrouille) {
           // Plus de modification en ligne, mais le rappel et l'annulation restent possibles
           appliquerLangue(); etat(t('verrouille'));
+          const hv = blocHoraire(rep.horaire);
+          if (hv) $('#contenu').prepend(hv);
           $('#contenu').append(blocRappel(rep.donnees.jours || []));
           return;
         }
-        donnees = rep.donnees;
+        donnees = rep.donnees; horaireLien = rep.horaire || null;
         joursInitiaux = (donnees.jours || []).slice();
       } catch (err) { etat(t('reseau')); return; }
     } else if (!cfg.ouvert && !APERCU) {
@@ -1344,6 +1518,8 @@
     if (donnees) {
       remplir(donnees);
       $('#bandeau-modif').after(blocRappel(donnees.jours || []));
+      const hv = blocHoraire(horaireLien);
+      if (hv) $('#contenu').prepend(hv);
       majEngagement();
     }
     majConditions();
@@ -1352,6 +1528,6 @@
   demarrer();
 })();
 </script>
-<p style="text-align:center;color:#8a93a3;font-size:12px;margin:24px 0 12px">version 2.3.8</p>
+<p style="text-align:center;color:#8a93a3;font-size:12px;margin:24px 0 12px">version 2.4.1</p>
 </body>
 </html>
